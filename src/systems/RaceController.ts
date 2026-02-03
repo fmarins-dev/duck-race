@@ -171,46 +171,111 @@ export class RaceController {
 
     const numKeyframes = 30; // One keyframe every 500ms
 
+    // Shared base distance — all ducks aim near the finish line
+    const baseEndX = this.finishX - 30;
+    const baseTotalDistance = baseEndX - RACE_START_X;
+
+    // Pre-generate per-duck oscillation parameters (3 layers each)
+    const amplitudes = [50, 30, 15];
+    const duckOscParams = this.ducks.map(() => {
+      const layers = amplitudes.map((amp) => ({
+        amplitude: amp,
+        frequency: this.rng.nextFloat(3, 8),
+        phase: this.rng.nextFloat(0, Math.PI * 2),
+      }));
+      return layers;
+    });
+
+    // Per-duck final offset: winner gets +110px, losers get -20 to -80px
+    const duckFinalOffsets = this.ducks.map((_, index) => {
+      if (index === this.winnerIndex) return 110;
+      return -this.rng.nextFloat(20, 80);
+    });
+
     this.ducks.forEach((duck, index) => {
-      const isWinner = index === this.winnerIndex;
       const keyframes: TrajectoryKeyframe[] = [];
-
-      // Winner ends past finish line, others fall short
-      const endX = isWinner
-        ? this.finishX + 80
-        : this.finishX - this.rng.nextInt(50, 250);
-
-      const totalDistance = endX - RACE_START_X;
+      const oscParams = duckOscParams[index];
+      const finalOffset = duckFinalOffsets[index];
 
       for (let i = 0; i <= numKeyframes; i++) {
-        const t = i / numKeyframes; // 0 to 1
+        const t = i / numKeyframes;
         const time = t * RACE_DURATION_MS;
 
-        // Base position (slightly eased progress)
-        const easedT = this.easeInOutQuad(t);
-        let x = RACE_START_X + totalDistance * easedT;
+        // Shared base position — all ducks follow the same progress curve
+        const progressT = this.raceProgressCurve(t);
+        let x = RACE_START_X + baseTotalDistance * progressT;
 
-        // Add oscillation for "jockey for position" effect
-        // More variance in middle of race, less at start/end
         if (i > 0 && i < numKeyframes) {
-          const varianceFactor = Math.sin(t * Math.PI); // Peak at 0.5
-          const oscillation = Math.sin(t * Math.PI * 6 + index * 1.5) * 40 * varianceFactor;
-          const randomVariance = this.rng.nextFloat(-20, 20) * varianceFactor;
-          x += oscillation + randomVariance;
+          // Multi-layer oscillation
+          const envelope = this.oscillationEnvelope(t);
+          let oscillation = 0;
+          for (const layer of oscParams) {
+            oscillation +=
+              Math.sin(t * Math.PI * 2 * layer.frequency + layer.phase) *
+              layer.amplitude;
+          }
+          x += oscillation * envelope;
+
+          // Small random noise
+          const noise = this.rng.nextFloat(-10, 10) * envelope;
+          x += noise;
+
+          // Late divergence: offset only applies after t > 0.80
+          if (t > 0.80) {
+            const divergenceFactor = Math.pow((t - 0.80) / 0.20, 3);
+            x += finalOffset * divergenceFactor;
+          }
         }
 
         keyframes.push({ time, x });
       }
 
       // Ensure final position is exact
-      keyframes[keyframes.length - 1].x = endX;
+      keyframes[keyframes.length - 1].x = baseEndX + finalOffset;
 
       this.trajectories.set(duck, keyframes);
     });
   }
 
-  private easeInOutQuad(t: number): number {
-    return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  /**
+   * 3-phase progress curve: slow start, cruise, sprint finish.
+   * All ducks share this curve so they stay grouped.
+   */
+  private raceProgressCurve(t: number): number {
+    if (t < 0.2) {
+      // Phase 1: Slow acceleration (cubic), covers 8% of distance
+      const p = t / 0.2;
+      return 0.08 * (p * p * p);
+    } else if (t < 0.8) {
+      // Phase 2: Constant cruise, covers 62% of distance
+      const p = (t - 0.2) / 0.6;
+      return 0.08 + 0.62 * p;
+    } else {
+      // Phase 3: Sprint finish (ease-out cubic), covers 30% of distance
+      const p = (t - 0.8) / 0.2;
+      return 0.70 + 0.30 * (1 - Math.pow(1 - p, 3));
+    }
+  }
+
+  /**
+   * Controls oscillation intensity over the race.
+   * Full strength in the middle, fades out before the finish for a clean ending.
+   */
+  private oscillationEnvelope(t: number): number {
+    if (t < 0.05) {
+      // Ramp up
+      return t / 0.05;
+    } else if (t < 0.75) {
+      // Full strength
+      return 1;
+    } else if (t < 0.93) {
+      // Cubic fade out
+      const p = (t - 0.75) / (0.93 - 0.75);
+      return 1 - p * p * p;
+    } else {
+      // Zero — clean finish
+      return 0;
+    }
   }
 
   update(delta: number): void {
@@ -291,10 +356,9 @@ export class RaceController {
     // Stop all ducks
     this.ducks.forEach((duck) => duck.stopMoving());
 
-    // Ensure winner is past finish line
+    // Ensure winner is past finish line (baseEndX - 30 + 110 = finishX + 80)
     if (this.winner) {
-      const finalX = this.finishX + 80;
-      this.winner.setTarget(finalX);
+      this.winner.setTarget(this.finishX + 80);
     }
 
     // Trigger callback
