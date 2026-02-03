@@ -1,13 +1,13 @@
 import Phaser from 'phaser';
 
 export class NameLabel extends Phaser.GameObjects.Text {
-  constructor(scene: Phaser.Scene, x: number, y: number, name: string) {
+  constructor(scene: Phaser.Scene, x: number, y: number, name: string, fontSize: number = 28) {
     super(scene, x, y, name, {
-      fontSize: '28px',
+      fontSize: `${fontSize}px`,
       fontFamily: 'Arial, sans-serif',
       color: '#ffffff',
       stroke: '#000000',
-      strokeThickness: 4,
+      strokeThickness: Math.round(fontSize * 4 / 28),
       align: 'center',
     });
 

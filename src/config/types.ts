@@ -9,6 +9,9 @@ export interface DuckConfig {
   variant: DuckVariant;
   laneY: number;
   startX: number;
+  scale: number;
+  labelFontSize: number;
+  labelOffsetY: number;
 }
 
 export interface TrajectoryKeyframe {

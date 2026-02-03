@@ -104,11 +104,11 @@ export class ManualNamesPopup extends Phaser.GameObjects.Container {
   private createTextarea(): void {
     this.textareaElement = document.createElement('textarea');
     this.textareaElement.id = 'manual-names-input';
-    this.textareaElement.placeholder = 'Alice\nBob\nCharlie';
+    this.textareaElement.placeholder = 'Alice\nBob\nCharlie\n...\n(max 25 nomes)';
     this.textareaElement.style.cssText = `
       position: absolute;
       width: 350px;
-      height: 150px;
+      height: 250px;
       font-size: 18px;
       font-family: Arial, sans-serif;
       padding: 12px;
@@ -140,7 +140,7 @@ export class ManualNamesPopup extends Phaser.GameObjects.Container {
     // Textarea position relative to popup center (which is at screen center)
     const textareaOffsetY = -20;
     const textareaWidth = 350;
-    const textareaHeight = 150;
+    const textareaHeight = 250;
 
     const screenX = rect.left + (GAME_WIDTH / 2 - textareaWidth / 2) * scaleX;
     const screenY = rect.top + (GAME_HEIGHT / 2 + textareaOffsetY - textareaHeight / 2) * scaleY;

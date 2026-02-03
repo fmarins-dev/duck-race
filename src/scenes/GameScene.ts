@@ -5,10 +5,12 @@ import {
   DUCK_VARIANTS,
   DEFAULT_NAMES,
   RACE_START_X,
+  getDuckDisplayConfig,
 } from '../config/constants';
 import { Duck } from '../entities/Duck';
 import { Button } from '../ui/Button';
 import { RaceController } from '../systems/RaceController';
+import { SeededRandom } from '../systems/SeededRandom';
 import type { RaceState, GameSceneData } from '../config/types';
 
 export class GameScene extends Phaser.Scene {
@@ -116,12 +118,19 @@ export class GameScene extends Phaser.Scene {
     const waterEndY = gameHeight - TILE_SIZE;
 
     const names = this.customNames ?? DEFAULT_NAMES;
-    const duckCount = Math.min(names.length, DUCK_VARIANTS.length);
+    const duckCount = names.length;
     const waterHeight = waterEndY - waterStartY;
     const spacing = waterHeight / (duckCount + 1);
 
+    const displayConfig = getDuckDisplayConfig(duckCount);
+
+    // Separate RNG for skin assignment (offset seed to not interfere with race RNG)
+    const skinSeed = (this.seed ?? Date.now()) + 1000;
+    const skinRng = new SeededRandom(skinSeed);
+
     for (let i = 0; i < duckCount; i++) {
-      const variant = DUCK_VARIANTS[i];
+      const variantIndex = skinRng.nextInt(0, DUCK_VARIANTS.length - 1);
+      const variant = DUCK_VARIANTS[variantIndex];
       const laneY = waterStartY + spacing * (i + 1);
 
       const duck = new Duck(this, {
@@ -129,6 +138,9 @@ export class GameScene extends Phaser.Scene {
         variant,
         laneY,
         startX: RACE_START_X,
+        scale: displayConfig.duckScale,
+        labelFontSize: displayConfig.labelFontSize,
+        labelOffsetY: displayConfig.labelOffsetY,
       });
 
       this.ducks.push(duck);

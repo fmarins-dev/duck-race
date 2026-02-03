@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
 import { NameLabel } from '../ui/NameLabel';
-import { NAME_LABEL_OFFSET_Y, DUCK_SCALE } from '../config/constants';
 import type { DuckConfig, DuckVariant } from '../config/types';
 
 export class Duck {
@@ -12,12 +11,14 @@ export class Duck {
 
   private targetX: number;
   private moving: boolean = false;
+  private labelOffsetY: number;
 
   constructor(scene: Phaser.Scene, config: DuckConfig) {
     this.name = config.name;
     this.variant = config.variant;
     this.laneY = config.laneY;
     this.targetX = config.startX;
+    this.labelOffsetY = config.labelOffsetY;
 
     // Create sprite
     this.sprite = scene.add.sprite(
@@ -26,7 +27,7 @@ export class Duck {
       'ducks',
       config.variant.startFrame
     );
-    this.sprite.setScale(DUCK_SCALE);
+    this.sprite.setScale(config.scale);
     this.sprite.setDepth(10);
     this.sprite.play(`swim-${config.variant.name}`);
 
@@ -34,8 +35,9 @@ export class Duck {
     this.nameLabel = new NameLabel(
       scene,
       config.startX,
-      config.laneY + NAME_LABEL_OFFSET_Y,
-      config.name
+      config.laneY + config.labelOffsetY,
+      config.name,
+      config.labelFontSize
     );
   }
 
@@ -88,7 +90,7 @@ export class Duck {
   }
 
   private updateLabelPosition(): void {
-    this.nameLabel.followSprite(this.sprite, NAME_LABEL_OFFSET_Y);
+    this.nameLabel.followSprite(this.sprite, this.labelOffsetY);
   }
 
   destroy(): void {

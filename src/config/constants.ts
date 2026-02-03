@@ -35,12 +35,22 @@ export const FINISH_LINE_ENTRY_TIME = 12000;
 export const FINISH_LINE_ENTER_DURATION = 3000;
 
 // Duck racing
-export const MAX_NAMES = 5;
-export const DUCK_SCALE = 3;
+export const MAX_NAMES = 25;
 export const POSITION_UPDATE_INTERVAL = 500;
 
+export function getDuckDisplayConfig(duckCount: number): {
+  duckScale: number;
+  labelFontSize: number;
+  labelOffsetY: number;
+} {
+  if (duckCount <= 5) return { duckScale: 3, labelFontSize: 28, labelOffsetY: -50 };
+  if (duckCount <= 10) return { duckScale: 2.5, labelFontSize: 22, labelOffsetY: -42 };
+  if (duckCount <= 15) return { duckScale: 2, labelFontSize: 18, labelOffsetY: -35 };
+  if (duckCount <= 20) return { duckScale: 1.5, labelFontSize: 14, labelOffsetY: -28 };
+  return { duckScale: 1.2, labelFontSize: 12, labelOffsetY: -22 };
+}
+
 // UI
-export const NAME_LABEL_OFFSET_Y = -50;
 export const BUTTON_WIDTH = 200;
 export const BUTTON_HEIGHT = 60;
 
@@ -50,10 +60,16 @@ export const MENU_TITLE_Y = 250;
 export const MENU_BUTTONS_START_Y = 450;
 
 // Popup
-export const POPUP_WIDTH = 450;
-export const POPUP_HEIGHT = 400;
+export const POPUP_WIDTH = 500;
+export const POPUP_HEIGHT = 500;
 export const POPUP_BG_COLOR = 0x2d3436;
 export const POPUP_OVERLAY_ALPHA = 0.7;
 
-// Default names for testing
-export const DEFAULT_NAMES = ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve'];
+// Default names
+export const DEFAULT_NAMES = [
+  'Alice', 'Bob', 'Charlie', 'Diana', 'Eve',
+  'Frank', 'Grace', 'Hank', 'Iris', 'Jack',
+  'Karen', 'Leo', 'Mona', 'Nick', 'Olga',
+  'Paul', 'Quinn', 'Rita', 'Sam', 'Tina',
+  'Uriel', 'Vera', 'Will', 'Xena', 'Yara',
+];
