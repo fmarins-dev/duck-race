@@ -9,27 +9,32 @@ import {
 import { Duck } from '../entities/Duck';
 import { Button } from '../ui/Button';
 import { RaceController } from '../systems/RaceController';
-import type { RaceState } from '../config/types';
+import type { RaceState, GameSceneData } from '../config/types';
 
 export class GameScene extends Phaser.Scene {
   private ducks: Duck[] = [];
   private raceController!: RaceController;
   private startButton!: Button;
   private restartButton!: Button;
+  private menuButton!: Button;
   private winnerText!: Phaser.GameObjects.Text;
   private seed?: number;
+  private customNames?: string[];
 
   constructor() {
     super({ key: 'GameScene' });
   }
 
-  init(): void {
+  init(data: GameSceneData): void {
     // Check for test mode seed
     const params = new URLSearchParams(window.location.search);
     const seedParam = params.get('seed');
     if (seedParam) {
       this.seed = parseInt(seedParam, 10);
     }
+
+    // Store custom names if provided
+    this.customNames = data?.customNames;
   }
 
   create(): void {
@@ -110,7 +115,7 @@ export class GameScene extends Phaser.Scene {
     const waterStartY = 5 * TILE_SIZE + TILE_SIZE + TILE_SIZE;
     const waterEndY = gameHeight - TILE_SIZE;
 
-    const names = DEFAULT_NAMES;
+    const names = this.customNames ?? DEFAULT_NAMES;
     const duckCount = Math.min(names.length, DUCK_VARIANTS.length);
     const waterHeight = waterEndY - waterStartY;
     const spacing = waterHeight / (duckCount + 1);
@@ -156,6 +161,13 @@ export class GameScene extends Phaser.Scene {
     this.restartButton.setVisible(false);
     this.restartButton.setScrollFactor(0);
 
+    // Menu button (hidden initially)
+    this.menuButton = new Button(this, centerX, topY + 160, 'Menu', () => {
+      this.scene.start('MainMenuScene');
+    });
+    this.menuButton.setVisible(false);
+    this.menuButton.setScrollFactor(0);
+
     // Winner text (hidden initially)
     this.winnerText = this.add.text(centerX, topY + 80, '', {
       fontSize: '48px',
@@ -174,6 +186,7 @@ export class GameScene extends Phaser.Scene {
   private startRace(): void {
     this.startButton.setVisible(false);
     this.restartButton.setVisible(false);
+    this.menuButton.setVisible(false);
     this.winnerText.setVisible(false);
 
     this.raceController.startRace();
@@ -184,9 +197,10 @@ export class GameScene extends Phaser.Scene {
     this.winnerText.setText(`${winner.name} venceu!`);
     this.winnerText.setVisible(true);
 
-    // Show restart button after a delay
+    // Show restart and menu buttons after a delay
     this.time.delayedCall(1500, () => {
       this.restartButton.setVisible(true);
+      this.menuButton.setVisible(true);
     });
   }
 
@@ -197,6 +211,7 @@ export class GameScene extends Phaser.Scene {
     // Reset UI
     this.winnerText.setVisible(false);
     this.restartButton.setVisible(false);
+    this.menuButton.setVisible(false);
 
     // If not in test mode with fixed seed, create new RNG
     if (!this.seed) {

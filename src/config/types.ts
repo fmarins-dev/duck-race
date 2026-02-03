@@ -37,8 +37,22 @@ export interface TestInterface {
   setWinner?: (index: number) => void;
 }
 
+export interface MenuTestInterface {
+  ready: boolean;
+  popupVisible: boolean;
+  openPopup: () => void;
+  closePopup: () => void;
+  setNames: (names: string[]) => void;
+  submitNames: () => void;
+}
+
+export interface GameSceneData {
+  customNames?: string[];
+}
+
 declare global {
   interface Window {
     __TEST__?: TestInterface;
+    __TEST_MENU__?: MenuTestInterface;
   }
 }

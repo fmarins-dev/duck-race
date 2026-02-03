@@ -44,5 +44,16 @@ export const NAME_LABEL_OFFSET_Y = -50;
 export const BUTTON_WIDTH = 200;
 export const BUTTON_HEIGHT = 60;
 
+// Menu
+export const MENU_BUTTON_SPACING = 100;
+export const MENU_TITLE_Y = 250;
+export const MENU_BUTTONS_START_Y = 450;
+
+// Popup
+export const POPUP_WIDTH = 450;
+export const POPUP_HEIGHT = 400;
+export const POPUP_BG_COLOR = 0x2d3436;
+export const POPUP_OVERLAY_ALPHA = 0.7;
+
 // Default names for testing
 export const DEFAULT_NAMES = ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve'];

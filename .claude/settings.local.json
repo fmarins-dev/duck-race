@@ -14,7 +14,8 @@
       "mcp__playwright__browser_evaluate",
       "mcp__playwright__browser_run_code",
       "Bash(pkill:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git config:*)"
     ]
   }
 }
