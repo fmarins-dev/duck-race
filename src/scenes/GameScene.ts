@@ -17,11 +17,13 @@ export class GameScene extends Phaser.Scene {
   private ducks: Duck[] = [];
   private raceController!: RaceController;
   private startButton!: Button;
-  private restartButton!: Button;
+  private keepWinnerButton!: Button;
+  private removeWinnerButton!: Button;
   private menuButton!: Button;
   private winnerText!: Phaser.GameObjects.Text;
   private seed?: number;
   private customNames?: string[];
+  private lastWinnerName: string | null = null;
 
   constructor() {
     super({ key: 'GameScene' });
@@ -30,6 +32,7 @@ export class GameScene extends Phaser.Scene {
   init(data: GameSceneData): void {
     // Reset instance state (Phaser reuses the same scene instance on restart)
     this.ducks = [];
+    this.lastWinnerName = null;
 
     // Check for test mode seed
     const params = new URLSearchParams(window.location.search);
@@ -171,16 +174,24 @@ export class GameScene extends Phaser.Scene {
     this.startButton.setDepth(200);
     this.startButton.setScrollFactor(0);
 
-    // Restart button (hidden initially)
-    this.restartButton = new Button(this, centerX - 120, topY, 'Reiniciar', () => {
-      this.restartRace();
+    // Keep Winner button (hidden initially)
+    this.keepWinnerButton = new Button(this, centerX - 230, topY, 'Manter Vencedor', () => {
+      this.restartKeepWinner();
     }, 200, 60);
-    this.restartButton.setDepth(200);
-    this.restartButton.setVisible(false);
-    this.restartButton.setScrollFactor(0);
+    this.keepWinnerButton.setDepth(200);
+    this.keepWinnerButton.setVisible(false);
+    this.keepWinnerButton.setScrollFactor(0);
+
+    // Remove Winner button (hidden initially)
+    this.removeWinnerButton = new Button(this, centerX, topY, 'Remover Vencedor', () => {
+      this.restartRemoveWinner();
+    }, 200, 60);
+    this.removeWinnerButton.setDepth(200);
+    this.removeWinnerButton.setVisible(false);
+    this.removeWinnerButton.setScrollFactor(0);
 
     // Menu button (hidden initially)
-    this.menuButton = new Button(this, centerX + 120, topY, 'Menu', () => {
+    this.menuButton = new Button(this, centerX + 230, topY, 'Menu', () => {
       this.scene.start('MainMenuScene');
     }, 200, 60);
     this.menuButton.setDepth(200);
@@ -204,7 +215,8 @@ export class GameScene extends Phaser.Scene {
 
   private startRace(): void {
     this.startButton.setVisible(false);
-    this.restartButton.setVisible(false);
+    this.keepWinnerButton.setVisible(false);
+    this.removeWinnerButton.setVisible(false);
     this.menuButton.setVisible(false);
     this.winnerText.setVisible(false);
 
@@ -212,40 +224,37 @@ export class GameScene extends Phaser.Scene {
   }
 
   private onRaceComplete(winner: Duck): void {
+    this.lastWinnerName = winner.name;
+
     // Show winner announcement
     this.winnerText.setText(`${winner.name} venceu!`);
     this.winnerText.setVisible(true);
 
-    // Show restart and menu buttons after a delay
+    // Show restart options and menu button after a delay
     this.time.delayedCall(1500, () => {
-      this.restartButton.setVisible(true);
+      this.keepWinnerButton.setVisible(true);
+      this.removeWinnerButton.setVisible(true);
       this.menuButton.setVisible(true);
     });
   }
 
-  private restartRace(): void {
-    // Reset race controller (generates new winner)
-    this.raceController.reset();
+  private restartKeepWinner(): void {
+    const names = this.customNames ?? DEFAULT_NAMES;
+    this.scene.start('GameScene', { customNames: names });
+  }
 
-    // Reset UI
-    this.winnerText.setVisible(false);
-    this.restartButton.setVisible(false);
-    this.menuButton.setVisible(false);
+  private restartRemoveWinner(): void {
+    const names = this.customNames ?? DEFAULT_NAMES;
+    const copy = [...names];
+    const idx = copy.indexOf(this.lastWinnerName!);
+    if (idx !== -1) copy.splice(idx, 1);
 
-    // If not in test mode with fixed seed, create new RNG
-    if (!this.seed) {
-      this.raceController = new RaceController(
-        this,
-        this.ducks,
-        undefined,
-        (winner) => this.onRaceComplete(winner)
-      );
+    if (copy.length < 2) {
+      this.scene.start('MainMenuScene');
+      return;
     }
 
-    // Show start button
-    this.time.delayedCall(300, () => {
-      this.startButton.setVisible(true);
-    });
+    this.scene.start('GameScene', { customNames: copy });
   }
 
   private setupTestSeam(): void {
@@ -274,6 +283,15 @@ export class GameScene extends Phaser.Scene {
       },
       setWinner: (index: number) => {
         this.raceController.forceWinner(index);
+      },
+      restartKeepWinner: () => {
+        this.restartKeepWinner();
+      },
+      restartRemoveWinner: () => {
+        this.restartRemoveWinner();
+      },
+      currentNames: () => {
+        return this.customNames ?? DEFAULT_NAMES;
       },
     };
 

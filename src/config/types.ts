@@ -39,6 +39,9 @@ export interface TestInterface {
   state: () => TestState;
   skipToTime?: (ms: number) => void;
   setWinner?: (index: number) => void;
+  restartKeepWinner?: () => void;
+  restartRemoveWinner?: () => void;
+  currentNames?: () => string[];
 }
 
 export interface MenuTestInterface {
