@@ -172,17 +172,17 @@ export class GameScene extends Phaser.Scene {
     this.startButton.setScrollFactor(0);
 
     // Restart button (hidden initially)
-    this.restartButton = new Button(this, centerX - 110, topY, 'Reiniciar', () => {
+    this.restartButton = new Button(this, centerX - 120, topY, 'Reiniciar', () => {
       this.restartRace();
-    });
+    }, 200, 60);
     this.restartButton.setDepth(200);
     this.restartButton.setVisible(false);
     this.restartButton.setScrollFactor(0);
 
     // Menu button (hidden initially)
-    this.menuButton = new Button(this, centerX + 110, topY, 'Menu', () => {
+    this.menuButton = new Button(this, centerX + 120, topY, 'Menu', () => {
       this.scene.start('MainMenuScene');
-    });
+    }, 200, 60);
     this.menuButton.setDepth(200);
     this.menuButton.setVisible(false);
     this.menuButton.setScrollFactor(0);

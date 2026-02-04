@@ -47,8 +47,8 @@ export function getDuckDisplayConfig(_duckCount: number): {
 }
 
 // UI
-export const BUTTON_WIDTH = 200;
-export const BUTTON_HEIGHT = 60;
+export const BUTTON_WIDTH = 340;
+export const BUTTON_HEIGHT = 70;
 
 // Menu
 export const MENU_BUTTON_SPACING = 100;

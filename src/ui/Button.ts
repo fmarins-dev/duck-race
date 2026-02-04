@@ -16,13 +16,18 @@ export class Button extends Phaser.GameObjects.Container {
     x: number,
     y: number,
     label: string,
-    callback: () => void
+    callback: () => void,
+    width?: number,
+    height?: number
   ) {
     super(scene, x, y);
     this.callback = callback;
 
+    const w = width ?? BUTTON_WIDTH;
+    const h = height ?? BUTTON_HEIGHT;
+
     // Create background
-    this.background = scene.add.rectangle(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT, this.normalColor);
+    this.background = scene.add.rectangle(0, 0, w, h, this.normalColor);
     this.background.setStrokeStyle(3, 0x2e7d32);
     this.add(this.background);
 
@@ -37,7 +42,7 @@ export class Button extends Phaser.GameObjects.Container {
     this.add(this.text);
 
     // Make interactive
-    this.setSize(BUTTON_WIDTH, BUTTON_HEIGHT);
+    this.setSize(w, h);
     this.setInteractive({ useHandCursor: true })
       .on('pointerover', this.onHover, this)
       .on('pointerout', this.onOut, this)

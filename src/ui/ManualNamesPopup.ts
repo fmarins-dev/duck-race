@@ -76,15 +76,15 @@ export class ManualNamesPopup extends Phaser.GameObjects.Container {
     this.createTextarea();
 
     // Submit button
-    this.submitButton = new Button(scene, -80, POPUP_HEIGHT / 2 - 50, 'Confirmar', () => {
+    this.submitButton = new Button(scene, -100, POPUP_HEIGHT / 2 - 50, 'Confirmar', () => {
       this.handleSubmit();
-    });
+    }, 180, 55);
     this.add(this.submitButton);
 
     // Cancel button
-    this.cancelButton = new Button(scene, 80, POPUP_HEIGHT / 2 - 50, 'Cancelar', () => {
+    this.cancelButton = new Button(scene, 100, POPUP_HEIGHT / 2 - 50, 'Cancelar', () => {
       this.handleCancel();
-    });
+    }, 180, 55);
     this.add(this.cancelButton);
 
     // Set depth to be on top
