@@ -28,6 +28,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   init(data: GameSceneData): void {
+    // Reset instance state (Phaser reuses the same scene instance on restart)
+    this.ducks = [];
+
     // Check for test mode seed
     const params = new URLSearchParams(window.location.search);
     const seedParam = params.get('seed');
