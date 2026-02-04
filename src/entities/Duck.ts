@@ -28,7 +28,7 @@ export class Duck {
       config.variant.startFrame
     );
     this.sprite.setScale(config.scale);
-    this.sprite.setDepth(10);
+    this.sprite.setDepth(config.depth);
     this.sprite.play(`swim-${config.variant.name}`);
 
     // Create name label above duck
@@ -37,7 +37,8 @@ export class Duck {
       config.startX,
       config.laneY + config.labelOffsetY,
       config.name,
-      config.labelFontSize
+      config.labelFontSize,
+      config.depth + 1
     );
   }
 

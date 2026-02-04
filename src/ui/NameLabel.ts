@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 
 export class NameLabel extends Phaser.GameObjects.Text {
-  constructor(scene: Phaser.Scene, x: number, y: number, name: string, fontSize: number = 28) {
+  constructor(scene: Phaser.Scene, x: number, y: number, name: string, fontSize: number = 28, depth: number = 10) {
     super(scene, x, y, name, {
       fontSize: `${fontSize}px`,
       fontFamily: 'Arial, sans-serif',
@@ -12,7 +12,7 @@ export class NameLabel extends Phaser.GameObjects.Text {
     });
 
     this.setOrigin(0.5, 1);
-    this.setDepth(10);
+    this.setDepth(depth);
     scene.add.existing(this);
   }
 

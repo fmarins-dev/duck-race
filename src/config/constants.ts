@@ -38,16 +38,12 @@ export const FINISH_LINE_ENTER_DURATION = 3000;
 export const MAX_NAMES = 25;
 export const POSITION_UPDATE_INTERVAL = 500;
 
-export function getDuckDisplayConfig(duckCount: number): {
+export function getDuckDisplayConfig(_duckCount: number): {
   duckScale: number;
   labelFontSize: number;
   labelOffsetY: number;
 } {
-  if (duckCount <= 5) return { duckScale: 3, labelFontSize: 28, labelOffsetY: -50 };
-  if (duckCount <= 10) return { duckScale: 2.5, labelFontSize: 22, labelOffsetY: -42 };
-  if (duckCount <= 15) return { duckScale: 2, labelFontSize: 18, labelOffsetY: -35 };
-  if (duckCount <= 20) return { duckScale: 1.5, labelFontSize: 14, labelOffsetY: -28 };
-  return { duckScale: 1.2, labelFontSize: 12, labelOffsetY: -22 };
+  return { duckScale: 3.5, labelFontSize: 24, labelOffsetY: -55 };
 }
 
 // UI

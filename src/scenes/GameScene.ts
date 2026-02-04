@@ -141,6 +141,7 @@ export class GameScene extends Phaser.Scene {
         scale: displayConfig.duckScale,
         labelFontSize: displayConfig.labelFontSize,
         labelOffsetY: displayConfig.labelOffsetY,
+        depth: 10 + i * 2,
       });
 
       this.ducks.push(duck);
@@ -164,19 +165,22 @@ export class GameScene extends Phaser.Scene {
     this.startButton = new Button(this, centerX, topY, 'Iniciar Corrida', () => {
       this.startRace();
     });
+    this.startButton.setDepth(200);
     this.startButton.setScrollFactor(0);
 
     // Restart button (hidden initially)
-    this.restartButton = new Button(this, centerX, topY, 'Reiniciar', () => {
+    this.restartButton = new Button(this, centerX - 110, topY, 'Reiniciar', () => {
       this.restartRace();
     });
+    this.restartButton.setDepth(200);
     this.restartButton.setVisible(false);
     this.restartButton.setScrollFactor(0);
 
     // Menu button (hidden initially)
-    this.menuButton = new Button(this, centerX, topY + 160, 'Menu', () => {
+    this.menuButton = new Button(this, centerX + 110, topY, 'Menu', () => {
       this.scene.start('MainMenuScene');
     });
+    this.menuButton.setDepth(200);
     this.menuButton.setVisible(false);
     this.menuButton.setScrollFactor(0);
 

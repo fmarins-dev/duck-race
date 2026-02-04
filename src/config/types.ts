@@ -12,6 +12,7 @@ export interface DuckConfig {
   scale: number;
   labelFontSize: number;
   labelOffsetY: number;
+  depth: number;
 }
 
 export interface TrajectoryKeyframe {
