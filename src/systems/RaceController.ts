@@ -8,6 +8,7 @@ import {
   FINISH_LINE_ENTER_DURATION,
   RACE_START_X,
   TILE_SIZE,
+  LAYOUT,
 } from '../config/constants';
 import type { RaceState, TrajectoryKeyframe } from '../config/types';
 
@@ -41,41 +42,35 @@ export class RaceController {
     this.onRaceComplete = onRaceComplete;
 
     this.finishX = scene.scale.width * FINISH_LINE_X_RATIO;
-    this.finishLineStartX = scene.scale.width + 100;
+    this.finishLineStartX = scene.scale.width + 30;
 
     this.createFinishLine();
   }
 
   private createFinishLine(): void {
-    // Calculate water-main area (where the finish line should appear)
-    // Layout: 5 sky rows + 1 ground + 1 water-top = 7 rows before water-main
-    const waterMainStartY = 7 * TILE_SIZE;
-    // water-main ends where water-bottom starts
-    const waterMainEndY = this.scene.scale.height - TILE_SIZE;
-    const waterMainHeight = waterMainEndY - waterMainStartY;
-    const waterMainCenterY = waterMainStartY + waterMainHeight / 2;
+    const waterStartY = LAYOUT.WATER_START * TILE_SIZE;
+    const waterEndY = (LAYOUT.WATER_END + 1) * TILE_SIZE;
+    const waterHeight = waterEndY - waterStartY;
+    const waterCenterY = waterStartY + waterHeight / 2;
 
-    // Create a simple checkered finish line (only in water-main area)
-    const lineWidth = 20;
+    const lineWidth = 6;
 
     this.finishLine = this.scene.add.rectangle(
       this.finishLineStartX,
-      waterMainCenterY,
+      waterCenterY,
       lineWidth,
-      waterMainHeight,
+      waterHeight,
       0xffffff
     );
-    // Set depth low so it's behind ducks but in front of tiles
     this.finishLine.setDepth(1);
 
     // Add checkered pattern effect
     const graphics = this.scene.add.graphics();
     graphics.setDepth(1);
 
-    // Store graphics reference and water-main bounds for positioning
     (this.finishLine as any).checkeredGraphics = graphics;
-    (this.finishLine as any).waterMainStartY = waterMainStartY;
-    (this.finishLine as any).waterMainHeight = waterMainHeight;
+    (this.finishLine as any).waterStartY = waterStartY;
+    (this.finishLine as any).waterHeight = waterHeight;
   }
 
   private updateCheckeredPattern(): void {
@@ -84,18 +79,17 @@ export class RaceController {
     const graphics = (this.finishLine as any).checkeredGraphics as Phaser.GameObjects.Graphics;
     if (!graphics) return;
 
-    const waterMainStartY = (this.finishLine as any).waterMainStartY as number;
-    const waterMainHeight = (this.finishLine as any).waterMainHeight as number;
+    const waterStartY = (this.finishLine as any).waterStartY as number;
+    const waterHeight = (this.finishLine as any).waterHeight as number;
 
     graphics.clear();
 
-    const x = this.finishLine.x - 10;
-    const squareSize = 20;
-    const numSquares = Math.ceil(waterMainHeight / squareSize);
+    const x = this.finishLine.x - 3;
+    const squareSize = 6;
+    const numSquares = Math.ceil(waterHeight / squareSize);
 
     for (let i = 0; i < numSquares; i++) {
-      const y = waterMainStartY + i * squareSize;
-      // Alternating black and white squares
+      const y = waterStartY + i * squareSize;
       graphics.fillStyle(i % 2 === 0 ? 0x000000 : 0xffffff);
       graphics.fillRect(x, y, squareSize, squareSize);
     }
@@ -172,11 +166,11 @@ export class RaceController {
     const numKeyframes = 30; // One keyframe every 500ms
 
     // Shared base distance — all ducks aim near the finish line
-    const baseEndX = this.finishX - 30;
+    const baseEndX = this.finishX - 8;
     const baseTotalDistance = baseEndX - RACE_START_X;
 
     // Pre-generate per-duck oscillation parameters (3 layers each)
-    const amplitudes = [50, 30, 15];
+    const amplitudes = [12, 8, 4];
     const duckOscParams = this.ducks.map(() => {
       const layers = amplitudes.map((amp) => ({
         amplitude: amp,
@@ -186,10 +180,10 @@ export class RaceController {
       return layers;
     });
 
-    // Per-duck final offset: winner gets +110px, losers get -20 to -80px
+    // Per-duck final offset: winner gets +28px, losers get -5 to -20px
     const duckFinalOffsets = this.ducks.map((_, index) => {
-      if (index === this.winnerIndex) return 110;
-      return -this.rng.nextFloat(20, 80);
+      if (index === this.winnerIndex) return 28;
+      return -this.rng.nextFloat(5, 20);
     });
 
     this.ducks.forEach((duck, index) => {
@@ -217,7 +211,7 @@ export class RaceController {
           x += oscillation * envelope;
 
           // Small random noise
-          const noise = this.rng.nextFloat(-10, 10) * envelope;
+          const noise = this.rng.nextFloat(-3, 3) * envelope;
           x += noise;
 
           // Late divergence: offset only applies after t > 0.80
@@ -356,9 +350,9 @@ export class RaceController {
     // Stop all ducks
     this.ducks.forEach((duck) => duck.stopMoving());
 
-    // Ensure winner is past finish line (baseEndX - 30 + 110 = finishX + 80)
+    // Ensure winner is past finish line
     if (this.winner) {
-      this.winner.setTarget(this.finishX + 80);
+      this.winner.setTarget(this.finishX + 20);
     }
 
     // Trigger callback

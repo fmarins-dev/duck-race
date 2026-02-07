@@ -45,12 +45,12 @@ export class ManualNamesPopup extends Phaser.GameObjects.Container {
 
     // Create modal background
     this.modalBg = scene.add.rectangle(0, 0, POPUP_WIDTH, POPUP_HEIGHT, POPUP_BG_COLOR);
-    this.modalBg.setStrokeStyle(3, 0x636e72);
+    this.modalBg.setStrokeStyle(1, 0x636e72);
     this.add(this.modalBg);
 
     // Title
-    this.titleText = scene.add.text(0, -POPUP_HEIGHT / 2 + 40, 'Adicionar Participantes', {
-      fontSize: '28px',
+    this.titleText = scene.add.text(0, -POPUP_HEIGHT / 2 + 14, 'Adicionar Participantes', {
+      fontSize: '10px',
       fontFamily: 'Arial, sans-serif',
       color: '#ffffff',
       fontStyle: 'bold',
@@ -61,10 +61,10 @@ export class ManualNamesPopup extends Phaser.GameObjects.Container {
     // Instruction text
     this.instructionText = scene.add.text(
       0,
-      -POPUP_HEIGHT / 2 + 80,
+      -POPUP_HEIGHT / 2 + 28,
       `Digite um nome por linha (max ${MAX_NAMES})`,
       {
-        fontSize: '16px',
+        fontSize: '7px',
         fontFamily: 'Arial, sans-serif',
         color: '#b2bec3',
       }
@@ -76,15 +76,15 @@ export class ManualNamesPopup extends Phaser.GameObjects.Container {
     this.createTextarea();
 
     // Submit button
-    this.submitButton = new Button(scene, -100, POPUP_HEIGHT / 2 - 50, 'Confirmar', () => {
+    this.submitButton = new Button(scene, -60, POPUP_HEIGHT / 2 - 16, 'Confirmar', () => {
       this.handleSubmit();
-    }, 180, 55);
+    }, 100, 20);
     this.add(this.submitButton);
 
     // Cancel button
-    this.cancelButton = new Button(scene, 100, POPUP_HEIGHT / 2 - 50, 'Cancelar', () => {
+    this.cancelButton = new Button(scene, 60, POPUP_HEIGHT / 2 - 16, 'Cancelar', () => {
       this.handleCancel();
-    }, 180, 55);
+    }, 100, 20);
     this.add(this.cancelButton);
 
     // Set depth to be on top
@@ -138,9 +138,9 @@ export class ManualNamesPopup extends Phaser.GameObjects.Container {
     const scaleY = rect.height / GAME_HEIGHT;
 
     // Textarea position relative to popup center (which is at screen center)
-    const textareaOffsetY = -20;
-    const textareaWidth = 350;
-    const textareaHeight = 250;
+    const textareaOffsetY = -5;
+    const textareaWidth = 420;
+    const textareaHeight = 170;
 
     const screenX = rect.left + (GAME_WIDTH / 2 - textareaWidth / 2) * scaleX;
     const screenY = rect.top + (GAME_HEIGHT / 2 + textareaOffsetY - textareaHeight / 2) * scaleY;

@@ -2,9 +2,12 @@ import Phaser from 'phaser';
 import {
   TILE_SIZE,
   TILE_INDICES,
+  LAYOUT,
   DUCK_VARIANTS,
   DEFAULT_NAMES,
   RACE_START_X,
+  WATER_SCROLL_SPEED,
+  WATER_TRANSITION_SCROLL_RATIO,
   getDuckDisplayConfig,
 } from '../config/constants';
 import { Duck } from '../entities/Duck';
@@ -15,6 +18,7 @@ import type { RaceState, GameSceneData } from '../config/types';
 
 export class GameScene extends Phaser.Scene {
   private ducks: Duck[] = [];
+  private waterTiles: Phaser.GameObjects.TileSprite[] = [];
   private raceController!: RaceController;
   private startButton!: Button;
   private keepWinnerButton!: Button;
@@ -32,6 +36,7 @@ export class GameScene extends Phaser.Scene {
   init(data: GameSceneData): void {
     // Reset instance state (Phaser reuses the same scene instance on restart)
     this.ducks = [];
+    this.waterTiles = [];
     this.lastWinnerName = null;
 
     // Check for test mode seed
@@ -67,6 +72,15 @@ export class GameScene extends Phaser.Scene {
     // Update race controller
     this.raceController.update(delta);
 
+    // Scroll water tiles only during the race
+    if (this.raceController.getState() === 'racing') {
+      const baseScroll = WATER_SCROLL_SPEED * (delta / 1000);
+      for (let i = 0; i < this.waterTiles.length; i++) {
+        const speed = i < 2 ? baseScroll * WATER_TRANSITION_SCROLL_RATIO : baseScroll;
+        this.waterTiles[i].tilePositionX += speed;
+      }
+    }
+
     // Update all ducks
     for (const duck of this.ducks) {
       duck.update(delta);
@@ -74,32 +88,50 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createTileBackground(): void {
-    const gameHeight = this.scale.height;
-    const skyRows = 5;
-    let currentY = skyRows * TILE_SIZE;
+    const cols = Math.ceil(this.scale.width / TILE_SIZE);
+    const width = this.scale.width;
 
-    this.createTileRow(currentY, TILE_INDICES.GROUND);
-    currentY += TILE_SIZE;
-
-    this.createTileRow(currentY, TILE_INDICES.WATER_TOP);
-    currentY += TILE_SIZE;
-
-    const waterBottomY = gameHeight - TILE_SIZE;
-    while (currentY < waterBottomY) {
-      this.createTileRow(currentY, TILE_INDICES.WATER_MAIN);
-      currentY += TILE_SIZE;
+    // Rows 0-1: Grass solid (static)
+    for (let row = LAYOUT.GRASS_TOP_START; row <= LAYOUT.GRASS_TOP_END; row++) {
+      this.createUniformTileRow(row, cols, TILE_INDICES.GRASS_SOLID);
     }
 
-    this.createTileRow(currentY, TILE_INDICES.WATER_BOTTOM);
+    // Row 2: Grass-to-water transition (TileSprite, slower scroll)
+    const grassBottomVariant = TILE_INDICES.GRASS_BOTTOM_VARIANTS[
+      Math.floor(Math.random() * TILE_INDICES.GRASS_BOTTOM_VARIANTS.length)
+    ];
+    this.createWaterTileSprite(LAYOUT.GRASS_TO_WATER, width, grassBottomVariant);
+
+    // Row 3: Water-to-grass transition (TileSprite, slower scroll)
+    const waterTopVariant = TILE_INDICES.WATER_TOP_VARIANTS[
+      Math.floor(Math.random() * TILE_INDICES.WATER_TOP_VARIANTS.length)
+    ];
+    this.createWaterTileSprite(LAYOUT.WATER_TO_GRASS_BOTTOM, width, waterTopVariant);
+
+    // Rows 4-13: Water solid (TileSprite, full scroll)
+    for (let row = LAYOUT.WATER_START; row <= LAYOUT.WATER_END; row++) {
+      this.createWaterTileSprite(row, width, TILE_INDICES.WATER_SOLID);
+    }
+
+    // Rows 14-16: Grass solid (static)
+    for (let row = LAYOUT.GRASS_BOTTOM_START; row <= LAYOUT.GRASS_BOTTOM_END; row++) {
+      this.createUniformTileRow(row, cols, TILE_INDICES.GRASS_SOLID);
+    }
   }
 
-  private createTileRow(y: number, tileIndex: number): void {
-    const gameWidth = this.scale.width;
-    const tilesNeeded = Math.ceil(gameWidth / TILE_SIZE);
-
-    for (let col = 0; col < tilesNeeded; col++) {
+  private createUniformTileRow(row: number, cols: number, tileIndex: number): void {
+    const y = row * TILE_SIZE;
+    for (let col = 0; col < cols; col++) {
       this.add.image(col * TILE_SIZE, y, 'tiles', tileIndex).setOrigin(0, 0);
     }
+  }
+
+  private createWaterTileSprite(row: number, width: number, frameIndex: number): void {
+    const y = row * TILE_SIZE;
+    const tile = this.add.tileSprite(0, y, width, TILE_SIZE, 'tiles', frameIndex);
+    tile.setOrigin(0, 0);
+    tile.setDepth(0);
+    this.waterTiles.push(tile);
   }
 
   private createDuckAnimations(): void {
@@ -119,9 +151,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createDucks(): void {
-    const gameHeight = this.scale.height;
-    const waterStartY = 5 * TILE_SIZE + TILE_SIZE + TILE_SIZE;
-    const waterEndY = gameHeight - TILE_SIZE;
+    const waterStartY = LAYOUT.WATER_START * TILE_SIZE;
+    const waterEndY = (LAYOUT.WATER_END + 1) * TILE_SIZE;
 
     const names = this.customNames ?? DEFAULT_NAMES;
     const duckCount = names.length;
@@ -165,19 +196,19 @@ export class GameScene extends Phaser.Scene {
 
   private createUI(): void {
     const centerX = this.scale.width / 2;
-    const topY = 50;
+    const topY = 12;
 
     // Start button
     this.startButton = new Button(this, centerX, topY, 'Iniciar Corrida', () => {
       this.startRace();
-    });
+    }, 80, 18);
     this.startButton.setDepth(200);
     this.startButton.setScrollFactor(0);
 
     // Keep Winner button (hidden initially)
-    this.keepWinnerButton = new Button(this, centerX - 230, topY, 'Manter Vencedor', () => {
+    this.keepWinnerButton = new Button(this, centerX - 65, topY, 'Manter Vencedor', () => {
       this.restartKeepWinner();
-    }, 200, 60);
+    }, 80, 18);
     this.keepWinnerButton.setDepth(200);
     this.keepWinnerButton.setVisible(false);
     this.keepWinnerButton.setScrollFactor(0);
@@ -185,26 +216,26 @@ export class GameScene extends Phaser.Scene {
     // Remove Winner button (hidden initially)
     this.removeWinnerButton = new Button(this, centerX, topY, 'Remover Vencedor', () => {
       this.restartRemoveWinner();
-    }, 200, 60);
+    }, 80, 18);
     this.removeWinnerButton.setDepth(200);
     this.removeWinnerButton.setVisible(false);
     this.removeWinnerButton.setScrollFactor(0);
 
     // Menu button (hidden initially)
-    this.menuButton = new Button(this, centerX + 230, topY, 'Menu', () => {
+    this.menuButton = new Button(this, centerX + 65, topY, 'Menu', () => {
       this.scene.start('MainMenuScene');
-    }, 200, 60);
+    }, 80, 18);
     this.menuButton.setDepth(200);
     this.menuButton.setVisible(false);
     this.menuButton.setScrollFactor(0);
 
     // Winner text (hidden initially)
-    this.winnerText = this.add.text(centerX, topY + 80, '', {
-      fontSize: '48px',
+    this.winnerText = this.add.text(centerX, topY + 22, '', {
+      fontSize: '14px',
       fontFamily: 'Arial, sans-serif',
       color: '#ffeb3b',
       stroke: '#000000',
-      strokeThickness: 6,
+      strokeThickness: 2,
       align: 'center',
     });
     this.winnerText.setOrigin(0.5, 0.5);

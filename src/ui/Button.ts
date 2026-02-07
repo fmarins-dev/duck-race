@@ -28,12 +28,12 @@ export class Button extends Phaser.GameObjects.Container {
 
     // Create background
     this.background = scene.add.rectangle(0, 0, w, h, this.normalColor);
-    this.background.setStrokeStyle(3, 0x2e7d32);
+    this.background.setStrokeStyle(1, 0x2e7d32);
     this.add(this.background);
 
     // Create text
     this.text = scene.add.text(0, 0, label, {
-      fontSize: '24px',
+      fontSize: '10px',
       fontFamily: 'Arial, sans-serif',
       color: '#ffffff',
       fontStyle: 'bold',

@@ -34,14 +34,19 @@
       "tileWidth": 16,
       "tileHeight": 16,
       "columns": 5,
-      "rows": 1,
-      "totalTiles": 5,
+      "rows": 2,
+      "totalTiles": 10,
       "tiles": [
-        { "index": 0, "name": "unused", "description": "Unused/error tile - do not use" },
-        { "index": 1, "name": "water-top", "description": "Water tile bordering the ground (cyan with zigzag)" },
-        { "index": 2, "name": "ground", "description": "Brown brick ground/shore" },
-        { "index": 3, "name": "water-bottom", "description": "Water tile at screen bottom edge (darker)" },
-        { "index": 4, "name": "water-main", "description": "Repeating water tile for the lake/sea body (cyan with waves)" }
+        { "index": 0, "name": "grass-bottom-1", "description": "Grass-to-water transition variant 1" },
+        { "index": 1, "name": "grass-bottom-2", "description": "Grass-to-water transition variant 2" },
+        { "index": 2, "name": "grass-bottom-3", "description": "Grass-to-water transition variant 3" },
+        { "index": 3, "name": "grass-bottom-4", "description": "Grass-to-water transition variant 4" },
+        { "index": 4, "name": "grass-solid", "description": "Solid grass tile" },
+        { "index": 5, "name": "water-top-1", "description": "Water-to-grass transition variant 1" },
+        { "index": 6, "name": "water-top-2", "description": "Water-to-grass transition variant 2" },
+        { "index": 7, "name": "water-top-3", "description": "Water-to-grass transition variant 3" },
+        { "index": 8, "name": "water-top-4", "description": "Water-to-grass transition variant 4" },
+        { "index": 9, "name": "water-solid", "description": "Solid water tile for the racing area" }
       ]
     }
   },

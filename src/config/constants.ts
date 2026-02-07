@@ -1,20 +1,34 @@
-export const GAME_WIDTH = 1920;
-export const GAME_HEIGHT = 1080;
+export const GAME_WIDTH = 480;
+export const GAME_HEIGHT = 270;
 
 export const TILE_SIZE = 16;
 export const DUCK_SIZE = 32;
 
 export const COLORS = {
-  SKY_GREEN: 0x9acd7a,
+  GRASS_GREEN: 0x9acd7a,
 };
 
 export const TILE_INDICES = {
-  // Note: Index 0 is unused (error tile in spritesheet)
-  WATER_TOP: 1,    // Water tile bordering the ground
-  GROUND: 2,       // Brown brick ground/shore
-  WATER_BOTTOM: 3, // Water tile at screen bottom edge
-  WATER_MAIN: 4,   // Repeating water tile for the lake/sea body
+  GRASS_BOTTOM_VARIANTS: [0, 1, 2, 3],
+  GRASS_SOLID: 4,
+  WATER_TOP_VARIANTS: [5, 6, 7, 8],
+  WATER_SOLID: 9,
 };
+
+// Tile layout zones (row indices, each row = 16px)
+export const LAYOUT = {
+  GRASS_TOP_START: 0,
+  GRASS_TOP_END: 1,
+  GRASS_TO_WATER: 2,
+  WATER_TO_GRASS_BOTTOM: 3,
+  WATER_START: 4,
+  WATER_END: 13,
+  GRASS_BOTTOM_START: 14,
+  GRASS_BOTTOM_END: 16,
+};
+
+export const WATER_SCROLL_SPEED = 30; // px/s (para esquerda)
+export const WATER_TRANSITION_SCROLL_RATIO = 0.6; // transicao mais lenta
 
 export const DUCK_VARIANTS = [
   { name: 'doge', startFrame: 0, endFrame: 2 },
@@ -32,7 +46,7 @@ export const RACE_DURATION_MS = 15000;
 export const RACE_DURATION_SEC = 15;
 
 // Positions
-export const RACE_START_X = -150;
+export const RACE_START_X = -40;
 export const FINISH_LINE_X_RATIO = 0.5;
 export const FINISH_LINE_ENTRY_TIME = 12000;
 export const FINISH_LINE_ENTER_DURATION = 3000;
@@ -41,26 +55,29 @@ export const FINISH_LINE_ENTER_DURATION = 3000;
 export const MAX_NAMES = 25;
 export const POSITION_UPDATE_INTERVAL = 500;
 
-export function getDuckDisplayConfig(_duckCount: number): {
+export function getDuckDisplayConfig(duckCount: number): {
   duckScale: number;
   labelFontSize: number;
   labelOffsetY: number;
 } {
-  return { duckScale: 3.5, labelFontSize: 24, labelOffsetY: -55 };
+  const scale = Math.max(0.35, Math.min(1.0, 8 / duckCount));
+  const labelFontSize = Math.round(8 * scale);
+  const labelOffsetY = Math.round(-16 * scale);
+  return { duckScale: scale, labelFontSize, labelOffsetY };
 }
 
 // UI
-export const BUTTON_WIDTH = 340;
-export const BUTTON_HEIGHT = 70;
+export const BUTTON_WIDTH = 120;
+export const BUTTON_HEIGHT = 24;
 
 // Menu
-export const MENU_BUTTON_SPACING = 100;
-export const MENU_TITLE_Y = 250;
-export const MENU_BUTTONS_START_Y = 450;
+export const MENU_BUTTON_SPACING = 30;
+export const MENU_TITLE_Y = 50;
+export const MENU_BUTTONS_START_Y = 110;
 
 // Popup
-export const POPUP_WIDTH = 500;
-export const POPUP_HEIGHT = 500;
+export const POPUP_WIDTH = 460;
+export const POPUP_HEIGHT = 250;
 export const POPUP_BG_COLOR = 0x2d3436;
 export const POPUP_OVERLAY_ALPHA = 0.7;
 

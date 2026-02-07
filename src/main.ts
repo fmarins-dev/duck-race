@@ -9,10 +9,11 @@ const config: Phaser.Types.Core.GameConfig = {
   width: GAME_WIDTH,
   height: GAME_HEIGHT,
   parent: 'game-container',
-  backgroundColor: COLORS.SKY_GREEN,
+  backgroundColor: COLORS.GRASS_GREEN,
   scale: {
-    mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH,
+    mode: Phaser.Scale.NONE,
+    autoCenter: Phaser.Scale.NO_CENTER,
+    zoom: 2,
   },
   scene: [BootScene, MainMenuScene, GameScene],
 };

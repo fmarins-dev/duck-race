@@ -23,18 +23,18 @@ export class MainMenuScene extends Phaser.Scene {
 
     // Title
     const title = this.add.text(centerX, MENU_TITLE_Y, 'Duck Race', {
-      fontSize: '72px',
+      fontSize: '24px',
       fontFamily: 'Arial, sans-serif',
       color: '#ffffff',
       fontStyle: 'bold',
       stroke: '#2d3436',
-      strokeThickness: 8,
+      strokeThickness: 3,
     });
     title.setOrigin(0.5, 0.5);
 
     // Subtitle
-    const subtitle = this.add.text(centerX, MENU_TITLE_Y + 60, 'Escolha como adicionar participantes', {
-      fontSize: '24px',
+    const subtitle = this.add.text(centerX, MENU_TITLE_Y + 20, 'Escolha como adicionar participantes', {
+      fontSize: '8px',
       fontFamily: 'Arial, sans-serif',
       color: '#dfe6e9',
     });
