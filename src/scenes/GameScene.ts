@@ -9,6 +9,8 @@ import {
   WATER_SCROLL_SPEED,
   WATER_TRANSITION_SCROLL_RATIO,
   getDuckDisplayConfig,
+  UI_FONT_KEY,
+  UI_FONT_SIZE_MD,
 } from '../config/constants';
 import { Duck } from '../entities/Duck';
 import { Button } from '../ui/Button';
@@ -24,7 +26,7 @@ export class GameScene extends Phaser.Scene {
   private keepWinnerButton!: Button;
   private removeWinnerButton!: Button;
   private menuButton!: Button;
-  private winnerText!: Phaser.GameObjects.Text;
+  private winnerText!: Phaser.GameObjects.BitmapText;
   private seed?: number;
   private customNames?: string[];
   private lastWinnerName: string | null = null;
@@ -231,15 +233,9 @@ export class GameScene extends Phaser.Scene {
     this.menuButton.setScrollFactor(0);
 
     // Winner text (hidden initially)
-    this.winnerText = this.add.text(centerX, topY + 22, '', {
-      fontSize: '14px',
-      fontFamily: '"Press Start 2P", monospace',
-      color: '#ffeb3b',
-      stroke: '#000000',
-      strokeThickness: 2,
-      align: 'center',
-    });
-    this.winnerText.setOrigin(0.5, 0.5);
+    this.winnerText = this.add.bitmapText(centerX, topY + 22, UI_FONT_KEY, '', UI_FONT_SIZE_MD);
+    this.centerBitmapText(this.winnerText, centerX, topY + 22);
+    this.winnerText.setTint(0xffeb3b);
     this.winnerText.setDepth(200);
     this.winnerText.setScrollFactor(0);
     this.winnerText.setVisible(false);
@@ -260,6 +256,7 @@ export class GameScene extends Phaser.Scene {
 
     // Show winner announcement
     this.winnerText.setText(`${winner.name} venceu!`);
+    this.centerBitmapText(this.winnerText, this.scale.width / 2, 12 + 22);
     this.winnerText.setVisible(true);
 
     // Show restart options and menu button after a delay
@@ -342,5 +339,11 @@ export class GameScene extends Phaser.Scene {
 
   getRaceState(): RaceState {
     return this.raceController.getState();
+  }
+
+  private centerBitmapText(text: Phaser.GameObjects.BitmapText, centerX: number, y: number): void {
+    const left = Math.round(centerX - text.width / 2);
+    text.setOrigin(0, 0.5);
+    text.setPosition(left, Math.round(y));
   }
 }

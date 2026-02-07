@@ -6,6 +6,9 @@ import {
   MENU_TITLE_Y,
   MENU_BUTTONS_START_Y,
   MENU_BUTTON_SPACING,
+  UI_FONT_KEY,
+  UI_FONT_SIZE_SM,
+  UI_FONT_SIZE_LG,
 } from '../config/constants';
 
 export class MainMenuScene extends Phaser.Scene {
@@ -23,23 +26,20 @@ export class MainMenuScene extends Phaser.Scene {
     const centerX = GAME_WIDTH / 2;
 
     // Title
-    const title = this.add.text(centerX, MENU_TITLE_Y, 'Duck Race', {
-      fontSize: '24px',
-      fontFamily: '"Press Start 2P", monospace',
-      color: '#ffffff',
-      fontStyle: 'bold',
-      stroke: '#2d3436',
-      strokeThickness: 3,
-    });
-    title.setOrigin(0.5, 0.5);
+    const title = this.add.bitmapText(centerX, MENU_TITLE_Y, UI_FONT_KEY, 'Duck Race', UI_FONT_SIZE_LG);
+    this.centerBitmapText(title, centerX, MENU_TITLE_Y);
+    title.setTint(0xffffff);
 
     // Subtitle
-    const subtitle = this.add.text(centerX, MENU_TITLE_Y + 20, 'Escolha como adicionar participantes', {
-      fontSize: '8px',
-      fontFamily: '"Press Start 2P", monospace',
-      color: '#dfe6e9',
-    });
-    subtitle.setOrigin(0.5, 0.5);
+    const subtitle = this.add.bitmapText(
+      centerX,
+      MENU_TITLE_Y + 20,
+      UI_FONT_KEY,
+      'Escolha como adicionar participantes',
+      UI_FONT_SIZE_SM
+    );
+    this.centerBitmapText(subtitle, centerX, MENU_TITLE_Y + 20);
+    subtitle.setTint(0xdfe6e9);
 
     // Create buttons
     this.createButtons(centerX);
@@ -140,5 +140,11 @@ export class MainMenuScene extends Phaser.Scene {
         window.__TEST_MENU__.ready = true;
       }
     });
+  }
+
+  private centerBitmapText(text: Phaser.GameObjects.BitmapText, centerX: number, y: number): void {
+    const left = Math.round(centerX - text.width / 2);
+    text.setOrigin(0, 0.5);
+    text.setPosition(left, Math.round(y));
   }
 }

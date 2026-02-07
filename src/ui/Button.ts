@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
-import { BUTTON_WIDTH, BUTTON_HEIGHT } from '../config/constants';
+import { BUTTON_WIDTH, BUTTON_HEIGHT, UI_FONT_KEY, UI_FONT_SIZE_SM } from '../config/constants';
 
 export class Button extends Phaser.GameObjects.Container {
   private background: Phaser.GameObjects.Rectangle;
-  private text: Phaser.GameObjects.Text;
+  private text: Phaser.GameObjects.BitmapText;
   private callback: () => void;
   private enabled: boolean = true;
 
@@ -32,13 +32,10 @@ export class Button extends Phaser.GameObjects.Container {
     this.add(this.background);
 
     // Create text
-    this.text = scene.add.text(0, 0, label, {
-      fontSize: '10px',
-      fontFamily: '"Press Start 2P", monospace',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    });
-    this.text.setOrigin(0.5, 0.5);
+    this.text = scene.add.bitmapText(0, 0, UI_FONT_KEY, label, UI_FONT_SIZE_SM);
+    this.text.setOrigin(0, 0.5);
+    this.text.setPosition(Math.round(-this.text.width / 2), 0);
+    this.text.setTint(0xffffff);
     this.add(this.text);
 
     // Make interactive
@@ -100,6 +97,7 @@ export class Button extends Phaser.GameObjects.Container {
 
   setLabel(label: string): void {
     this.text.setText(label);
+    this.text.setPosition(Math.round(-this.text.width / 2), 0);
   }
 
   setScrollFactor(x: number, y?: number): this {

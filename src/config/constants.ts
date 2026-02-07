@@ -1,6 +1,11 @@
 export const GAME_WIDTH = 480;
 export const GAME_HEIGHT = 270;
 
+export const UI_FONT_KEY = 'press-start-2p';
+export const UI_FONT_SIZE_SM = 10;
+export const UI_FONT_SIZE_MD = 20;
+export const UI_FONT_SIZE_LG = 30;
+
 export const TILE_SIZE = 16;
 export const DUCK_SIZE = 32;
 
@@ -61,7 +66,7 @@ export function getDuckDisplayConfig(_duckCount: number): {
   labelOffsetY: number;
 } {
   const scale = 1;
-  const labelFontSize = 8;
+  const labelFontSize = UI_FONT_SIZE_SM;
   const labelOffsetY = -16;
   return { duckScale: scale, labelFontSize, labelOffsetY };
 }

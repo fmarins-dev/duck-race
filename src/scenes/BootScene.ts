@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { UI_FONT_KEY } from '../config/constants';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -17,9 +18,16 @@ export class BootScene extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 32,
     });
+
+    this.load.bitmapFont(
+      UI_FONT_KEY,
+      'assets/fonts/press-start-2p/thick_8x8.png',
+      'assets/fonts/press-start-2p/thick_8x8.xml'
+    );
   }
 
   create(): void {
+    this.textures.get(UI_FONT_KEY).setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.scene.start('MainMenuScene');
   }
 }

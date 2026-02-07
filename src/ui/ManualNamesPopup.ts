@@ -8,13 +8,16 @@ import {
   POPUP_BG_COLOR,
   POPUP_OVERLAY_ALPHA,
   MAX_NAMES,
+  UI_FONT_KEY,
+  UI_FONT_SIZE_SM,
+  UI_FONT_SIZE_MD,
 } from '../config/constants';
 
 export class ManualNamesPopup extends Phaser.GameObjects.Container {
   private overlay: Phaser.GameObjects.Rectangle;
   private modalBg: Phaser.GameObjects.Rectangle;
-  private titleText: Phaser.GameObjects.Text;
-  private instructionText: Phaser.GameObjects.Text;
+  private titleText: Phaser.GameObjects.BitmapText;
+  private instructionText: Phaser.GameObjects.BitmapText;
   private textareaElement: HTMLTextAreaElement | null = null;
   private submitButton: Button;
   private cancelButton: Button;
@@ -49,27 +52,27 @@ export class ManualNamesPopup extends Phaser.GameObjects.Container {
     this.add(this.modalBg);
 
     // Title
-    this.titleText = scene.add.text(0, -POPUP_HEIGHT / 2 + 14, 'Adicionar Participantes', {
-      fontSize: '10px',
-      fontFamily: '"Press Start 2P", monospace',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    });
-    this.titleText.setOrigin(0.5, 0.5);
+    this.titleText = scene.add.bitmapText(
+      0,
+      -POPUP_HEIGHT / 2 + 18,
+      UI_FONT_KEY,
+      'Adicionar Participantes',
+      UI_FONT_SIZE_MD
+    );
+    this.centerBitmapText(this.titleText, -POPUP_HEIGHT / 2 + 18);
+    this.titleText.setTint(0xffffff);
     this.add(this.titleText);
 
     // Instruction text
-    this.instructionText = scene.add.text(
+    this.instructionText = scene.add.bitmapText(
       0,
-      -POPUP_HEIGHT / 2 + 28,
+      -POPUP_HEIGHT / 2 + 38,
+      UI_FONT_KEY,
       `Digite um nome por linha (max ${MAX_NAMES})`,
-      {
-        fontSize: '7px',
-        fontFamily: '"Press Start 2P", monospace',
-        color: '#b2bec3',
-      }
+      UI_FONT_SIZE_SM
     );
-    this.instructionText.setOrigin(0.5, 0.5);
+    this.centerBitmapText(this.instructionText, -POPUP_HEIGHT / 2 + 38);
+    this.instructionText.setTint(0xb2bec3);
     this.add(this.instructionText);
 
     // Create HTML textarea
@@ -109,7 +112,7 @@ export class ManualNamesPopup extends Phaser.GameObjects.Container {
       position: absolute;
       width: 350px;
       height: 250px;
-      font-size: 18px;
+      font-size: 16px;
       font-family: "Press Start 2P", monospace;
       padding: 12px;
       border: 2px solid #636e72;
@@ -149,7 +152,7 @@ export class ManualNamesPopup extends Phaser.GameObjects.Container {
     this.textareaElement.style.top = `${screenY}px`;
     this.textareaElement.style.width = `${textareaWidth * scaleX}px`;
     this.textareaElement.style.height = `${textareaHeight * scaleY}px`;
-    this.textareaElement.style.fontSize = `${18 * Math.min(scaleX, scaleY)}px`;
+    this.textareaElement.style.fontSize = `${16 * Math.min(scaleX, scaleY)}px`;
   }
 
   private parseNames(): string[] {
@@ -171,7 +174,8 @@ export class ManualNamesPopup extends Phaser.GameObjects.Container {
     if (names.length === 0) {
       // Show error - at least one name required
       this.instructionText.setText('Insira pelo menos um nome!');
-      this.instructionText.setColor('#e74c3c');
+      this.instructionText.setTint(0xe74c3c);
+      this.centerBitmapText(this.instructionText, -POPUP_HEIGHT / 2 + 38);
       return;
     }
 
@@ -180,6 +184,12 @@ export class ManualNamesPopup extends Phaser.GameObjects.Container {
 
   private handleCancel(): void {
     this.onCancelCallback();
+  }
+
+  private centerBitmapText(text: Phaser.GameObjects.BitmapText, y: number): void {
+    const left = Math.round(-text.width / 2);
+    text.setOrigin(0, 0.5);
+    text.setPosition(left, Math.round(y));
   }
 
   getNames(): string[] {
