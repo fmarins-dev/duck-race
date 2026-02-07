@@ -1,0 +1,82 @@
+{ "frames": [
+   {
+    "filename": "ducks 0.aseprite",
+    "frame": { "x": 0, "y": 0, "w": 32, "h": 256 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 256 },
+    "sourceSize": { "w": 32, "h": 256 },
+    "duration": 100
+   },
+   {
+    "filename": "ducks 1.aseprite",
+    "frame": { "x": 32, "y": 0, "w": 32, "h": 256 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 256 },
+    "sourceSize": { "w": 32, "h": 256 },
+    "duration": 100
+   },
+   {
+    "filename": "ducks 2.aseprite",
+    "frame": { "x": 64, "y": 0, "w": 32, "h": 256 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 256 },
+    "sourceSize": { "w": 32, "h": 256 },
+    "duration": 100
+   }
+ ],
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.16.1-x64",
+  "format": "RGBA8888",
+  "size": { "w": 96, "h": 256 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "doge" },
+   { "name": "content", "group": "doge" },
+   { "name": "body", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "under simple", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "skin", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "viking" },
+   { "name": "content", "group": "viking" },
+   { "name": "body", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "under simple", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "skin", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "astronaut" },
+   { "name": "content", "group": "astronaut" },
+   { "name": "body", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "skin", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "under simple", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "mario" },
+   { "name": "content", "group": "mario" },
+   { "name": "body", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "under simple", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "skin", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "plain" },
+   { "name": "content", "group": "plain" },
+   { "name": "body", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "under simple", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "alien" },
+   { "name": "content", "group": "alien" },
+   { "name": "body", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "under simple", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "skin", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "wizard" },
+   { "name": "content", "group": "wizard" },
+   { "name": "body", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "under simple", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "skin", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "cowboy" },
+   { "name": "content", "group": "cowboy" },
+   { "name": "body", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "skin", "group": "content", "opacity": 255, "blendMode": "normal" },
+   { "name": "under simple", "group": "content", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

@@ -22,6 +22,9 @@ export const DUCK_VARIANTS = [
   { name: 'astronaut', startFrame: 6, endFrame: 8 },
   { name: 'mario', startFrame: 9, endFrame: 11 },
   { name: 'plain', startFrame: 12, endFrame: 14 },
+  { name: 'alien', startFrame: 15, endFrame: 17 },
+  { name: 'wizard', startFrame: 18, endFrame: 20 },
+  { name: 'cowboy', startFrame: 21, endFrame: 23 },
 ] as const;
 
 // Race Configuration
