@@ -34,7 +34,7 @@ export class Button extends Phaser.GameObjects.Container {
     // Create text
     this.text = scene.add.bitmapText(0, 0, UI_FONT_KEY, label, UI_FONT_SIZE_SM);
     this.text.setOrigin(0, 0.5);
-    this.text.setPosition(Math.round(-this.text.width / 2), 0);
+    this.text.setPosition(Math.round(-this.text.width / 2), 2);
     this.text.setTint(0xffffff);
     this.add(this.text);
 
@@ -97,7 +97,7 @@ export class Button extends Phaser.GameObjects.Container {
 
   setLabel(label: string): void {
     this.text.setText(label);
-    this.text.setPosition(Math.round(-this.text.width / 2), 0);
+    this.text.setPosition(Math.round(-this.text.width / 2), 2);
   }
 
   setScrollFactor(x: number, y?: number): this {

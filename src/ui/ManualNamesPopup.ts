@@ -54,24 +54,24 @@ export class ManualNamesPopup extends Phaser.GameObjects.Container {
     // Title
     this.titleText = scene.add.bitmapText(
       0,
-      -POPUP_HEIGHT / 2 + 18,
+      -POPUP_HEIGHT / 2 + 32,
       UI_FONT_KEY,
-      'Adicionar Participantes',
+      'Add Participants',
       UI_FONT_SIZE_MD
     );
-    this.centerBitmapText(this.titleText, -POPUP_HEIGHT / 2 + 18);
+    this.centerBitmapText(this.titleText, -POPUP_HEIGHT / 2 + 32);
     this.titleText.setTint(0xffffff);
     this.add(this.titleText);
 
     // Instruction text
     this.instructionText = scene.add.bitmapText(
       0,
-      -POPUP_HEIGHT / 2 + 38,
+      -POPUP_HEIGHT / 2 + 52,
       UI_FONT_KEY,
-      `Digite um nome por linha (max ${MAX_NAMES})`,
+      `One name per line (max ${MAX_NAMES})`,
       UI_FONT_SIZE_SM
     );
-    this.centerBitmapText(this.instructionText, -POPUP_HEIGHT / 2 + 38);
+    this.centerBitmapText(this.instructionText, -POPUP_HEIGHT / 2 + 52);
     this.instructionText.setTint(0xb2bec3);
     this.add(this.instructionText);
 
@@ -79,13 +79,13 @@ export class ManualNamesPopup extends Phaser.GameObjects.Container {
     this.createTextarea();
 
     // Submit button
-    this.submitButton = new Button(scene, -60, POPUP_HEIGHT / 2 - 16, 'Confirmar', () => {
+    this.submitButton = new Button(scene, -60, POPUP_HEIGHT / 2 - 24, 'Confirm', () => {
       this.handleSubmit();
     }, 100, 20);
     this.add(this.submitButton);
 
     // Cancel button
-    this.cancelButton = new Button(scene, 60, POPUP_HEIGHT / 2 - 16, 'Cancelar', () => {
+    this.cancelButton = new Button(scene, 60, POPUP_HEIGHT / 2 - 24, 'Cancel', () => {
       this.handleCancel();
     }, 100, 20);
     this.add(this.cancelButton);
@@ -107,7 +107,8 @@ export class ManualNamesPopup extends Phaser.GameObjects.Container {
   private createTextarea(): void {
     this.textareaElement = document.createElement('textarea');
     this.textareaElement.id = 'manual-names-input';
-    this.textareaElement.placeholder = 'Alice\nBob\nCharlie\n...\n(max 25 nomes)';
+    this.textareaElement.value = 'Alice\nBob\nCharlie';
+    this.textareaElement.placeholder = '(max 25 names)';
     this.textareaElement.style.cssText = `
       position: absolute;
       width: 350px;
@@ -141,9 +142,9 @@ export class ManualNamesPopup extends Phaser.GameObjects.Container {
     const scaleY = rect.height / GAME_HEIGHT;
 
     // Textarea position relative to popup center (which is at screen center)
-    const textareaOffsetY = -5;
+    const textareaOffsetY = 7;
     const textareaWidth = 420;
-    const textareaHeight = 170;
+    const textareaHeight = 130;
 
     const screenX = rect.left + (GAME_WIDTH / 2 - textareaWidth / 2) * scaleX;
     const screenY = rect.top + (GAME_HEIGHT / 2 + textareaOffsetY - textareaHeight / 2) * scaleY;
@@ -173,9 +174,9 @@ export class ManualNamesPopup extends Phaser.GameObjects.Container {
     const names = this.parseNames();
     if (names.length === 0) {
       // Show error - at least one name required
-      this.instructionText.setText('Insira pelo menos um nome!');
+      this.instructionText.setText('Enter at least one name!');
       this.instructionText.setTint(0xe74c3c);
-      this.centerBitmapText(this.instructionText, -POPUP_HEIGHT / 2 + 38);
+      this.centerBitmapText(this.instructionText, -POPUP_HEIGHT / 2 + 52);
       return;
     }
 

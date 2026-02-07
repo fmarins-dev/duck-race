@@ -35,7 +35,7 @@ export class MainMenuScene extends Phaser.Scene {
       centerX,
       MENU_TITLE_Y + 20,
       UI_FONT_KEY,
-      'Escolha como adicionar participantes',
+      'Choose how to add participants',
       UI_FONT_SIZE_SM
     );
     this.centerBitmapText(subtitle, centerX, MENU_TITLE_Y + 20);
@@ -56,7 +56,7 @@ export class MainMenuScene extends Phaser.Scene {
       this,
       centerX,
       startY,
-      'Twitch (Em breve)',
+      'Twitch (Coming soon)',
       () => {}
     );
     this.twitchButton.setEnabled(false);
@@ -66,7 +66,7 @@ export class MainMenuScene extends Phaser.Scene {
       this,
       centerX,
       startY + MENU_BUTTON_SPACING,
-      'Discord (Em breve)',
+      'Discord (Coming soon)',
       () => {}
     );
     this.discordButton.setEnabled(false);
@@ -76,7 +76,7 @@ export class MainMenuScene extends Phaser.Scene {
       this,
       centerX,
       startY + MENU_BUTTON_SPACING * 2,
-      'Nomes Manuais',
+      'Manual Names',
       () => this.showManualNamesPopup()
     );
   }

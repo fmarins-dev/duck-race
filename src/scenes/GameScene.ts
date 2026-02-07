@@ -202,39 +202,40 @@ export class GameScene extends Phaser.Scene {
     const topY = 12;
 
     // Start button
-    this.startButton = new Button(this, centerX, topY, 'Iniciar Corrida', () => {
+    this.startButton = new Button(this, centerX, topY, 'Start Race', () => {
       this.startRace();
-    }, 80, 18);
+    }, 90, 18);
     this.startButton.setDepth(200);
     this.startButton.setScrollFactor(0);
 
     // Keep Winner button (hidden initially)
-    this.keepWinnerButton = new Button(this, centerX - 65, topY, 'Manter Vencedor', () => {
+    this.keepWinnerButton = new Button(this, centerX - 88, topY, 'Keep Winner', () => {
       this.restartKeepWinner();
-    }, 80, 18);
+    }, 96, 18);
     this.keepWinnerButton.setDepth(200);
     this.keepWinnerButton.setVisible(false);
     this.keepWinnerButton.setScrollFactor(0);
 
     // Remove Winner button (hidden initially)
-    this.removeWinnerButton = new Button(this, centerX, topY, 'Remover Vencedor', () => {
+    this.removeWinnerButton = new Button(this, centerX + 24, topY, 'Remove Winner', () => {
       this.restartRemoveWinner();
-    }, 80, 18);
+    }, 112, 18);
     this.removeWinnerButton.setDepth(200);
     this.removeWinnerButton.setVisible(false);
     this.removeWinnerButton.setScrollFactor(0);
 
     // Menu button (hidden initially)
-    this.menuButton = new Button(this, centerX + 65, topY, 'Menu', () => {
+    this.menuButton = new Button(this, centerX + 112, topY, 'Menu', () => {
       this.scene.start('MainMenuScene');
-    }, 80, 18);
+    }, 48, 18);
     this.menuButton.setDepth(200);
     this.menuButton.setVisible(false);
     this.menuButton.setScrollFactor(0);
 
-    // Winner text (hidden initially)
-    this.winnerText = this.add.bitmapText(centerX, topY + 22, UI_FONT_KEY, '', UI_FONT_SIZE_MD);
-    this.centerBitmapText(this.winnerText, centerX, topY + 22);
+    // Winner text (hidden initially, centered on screen)
+    const centerY = this.scale.height / 2;
+    this.winnerText = this.add.bitmapText(centerX, centerY, UI_FONT_KEY, '', UI_FONT_SIZE_MD);
+    this.centerBitmapText(this.winnerText, centerX, centerY);
     this.winnerText.setTint(0xffeb3b);
     this.winnerText.setDepth(200);
     this.winnerText.setScrollFactor(0);
@@ -254,10 +255,22 @@ export class GameScene extends Phaser.Scene {
   private onRaceComplete(winner: Duck): void {
     this.lastWinnerName = winner.name;
 
-    // Show winner announcement
-    this.winnerText.setText(`${winner.name} venceu!`);
-    this.centerBitmapText(this.winnerText, this.scale.width / 2, 12 + 22);
+    // Show winner announcement centered on screen
+    const centerX = this.scale.width / 2;
+    const centerY = this.scale.height / 2;
+    this.winnerText.setText(`${winner.name} wins!`);
+    this.centerBitmapText(this.winnerText, centerX, centerY);
     this.winnerText.setVisible(true);
+
+    // Gentle pulse animation
+    this.tweens.add({
+      targets: this.winnerText,
+      alpha: { from: 1, to: 0.6 },
+      duration: 800,
+      ease: 'Sine.easeInOut',
+      yoyo: true,
+      repeat: -1,
+    });
 
     // Show restart options and menu button after a delay
     this.time.delayedCall(1500, () => {
