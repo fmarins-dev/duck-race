@@ -54,6 +54,7 @@ export class GameScene extends Phaser.Scene {
     // Lock camera - prevent any scrolling
     this.cameras.main.setScroll(0, 0);
     this.cameras.main.setZoom(1);
+    this.cameras.main.roundPixels = true;
     this.cameras.main.setBounds(0, 0, this.scale.width, this.scale.height);
     this.cameras.main.useBounds = true;
 
@@ -168,7 +169,7 @@ export class GameScene extends Phaser.Scene {
     for (let i = 0; i < duckCount; i++) {
       const variantIndex = skinRng.nextInt(0, DUCK_VARIANTS.length - 1);
       const variant = DUCK_VARIANTS[variantIndex];
-      const laneY = waterStartY + spacing * (i + 1);
+      const laneY = Math.round(waterStartY + spacing * (i + 1));
 
       const duck = new Duck(this, {
         name: names[i],
@@ -232,7 +233,7 @@ export class GameScene extends Phaser.Scene {
     // Winner text (hidden initially)
     this.winnerText = this.add.text(centerX, topY + 22, '', {
       fontSize: '14px',
-      fontFamily: 'Arial, sans-serif',
+      fontFamily: '"Press Start 2P", monospace',
       color: '#ffeb3b',
       stroke: '#000000',
       strokeThickness: 2,

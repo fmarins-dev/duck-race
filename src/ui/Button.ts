@@ -34,7 +34,7 @@ export class Button extends Phaser.GameObjects.Container {
     // Create text
     this.text = scene.add.text(0, 0, label, {
       fontSize: '10px',
-      fontFamily: 'Arial, sans-serif',
+      fontFamily: '"Press Start 2P", monospace',
       color: '#ffffff',
       fontStyle: 'bold',
     });
@@ -56,8 +56,7 @@ export class Button extends Phaser.GameObjects.Container {
     this.background.setFillStyle(this.hoverColor);
     this.scene.tweens.add({
       targets: this,
-      scaleX: 1.05,
-      scaleY: 1.05,
+      alpha: 0.9,
       duration: 100,
     });
   }
@@ -67,8 +66,7 @@ export class Button extends Phaser.GameObjects.Container {
     this.background.setFillStyle(this.normalColor);
     this.scene.tweens.add({
       targets: this,
-      scaleX: 1,
-      scaleY: 1,
+      alpha: 1,
       duration: 100,
     });
   }
@@ -79,11 +77,11 @@ export class Button extends Phaser.GameObjects.Container {
     // Click animation
     this.scene.tweens.add({
       targets: this,
-      scaleX: 0.95,
-      scaleY: 0.95,
+      alpha: 0.75,
       duration: 50,
       yoyo: true,
       onComplete: () => {
+        this.alpha = 1;
         this.callback();
       },
     });

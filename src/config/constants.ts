@@ -55,14 +55,14 @@ export const FINISH_LINE_ENTER_DURATION = 3000;
 export const MAX_NAMES = 25;
 export const POSITION_UPDATE_INTERVAL = 500;
 
-export function getDuckDisplayConfig(duckCount: number): {
+export function getDuckDisplayConfig(_duckCount: number): {
   duckScale: number;
   labelFontSize: number;
   labelOffsetY: number;
 } {
-  const scale = Math.max(0.35, Math.min(1.0, 8 / duckCount));
-  const labelFontSize = Math.round(8 * scale);
-  const labelOffsetY = Math.round(-16 * scale);
+  const scale = 1;
+  const labelFontSize = 8;
+  const labelOffsetY = -16;
   return { duckScale: scale, labelFontSize, labelOffsetY };
 }
 

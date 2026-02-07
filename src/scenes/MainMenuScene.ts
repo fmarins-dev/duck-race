@@ -19,12 +19,13 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   create(): void {
+    this.cameras.main.roundPixels = true;
     const centerX = GAME_WIDTH / 2;
 
     // Title
     const title = this.add.text(centerX, MENU_TITLE_Y, 'Duck Race', {
       fontSize: '24px',
-      fontFamily: 'Arial, sans-serif',
+      fontFamily: '"Press Start 2P", monospace',
       color: '#ffffff',
       fontStyle: 'bold',
       stroke: '#2d3436',
@@ -35,7 +36,7 @@ export class MainMenuScene extends Phaser.Scene {
     // Subtitle
     const subtitle = this.add.text(centerX, MENU_TITLE_Y + 20, 'Escolha como adicionar participantes', {
       fontSize: '8px',
-      fontFamily: 'Arial, sans-serif',
+      fontFamily: '"Press Start 2P", monospace',
       color: '#dfe6e9',
     });
     subtitle.setOrigin(0.5, 0.5);

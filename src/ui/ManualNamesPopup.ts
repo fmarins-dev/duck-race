@@ -51,7 +51,7 @@ export class ManualNamesPopup extends Phaser.GameObjects.Container {
     // Title
     this.titleText = scene.add.text(0, -POPUP_HEIGHT / 2 + 14, 'Adicionar Participantes', {
       fontSize: '10px',
-      fontFamily: 'Arial, sans-serif',
+      fontFamily: '"Press Start 2P", monospace',
       color: '#ffffff',
       fontStyle: 'bold',
     });
@@ -65,7 +65,7 @@ export class ManualNamesPopup extends Phaser.GameObjects.Container {
       `Digite um nome por linha (max ${MAX_NAMES})`,
       {
         fontSize: '7px',
-        fontFamily: 'Arial, sans-serif',
+        fontFamily: '"Press Start 2P", monospace',
         color: '#b2bec3',
       }
     );
@@ -110,7 +110,7 @@ export class ManualNamesPopup extends Phaser.GameObjects.Container {
       width: 350px;
       height: 250px;
       font-size: 18px;
-      font-family: Arial, sans-serif;
+      font-family: "Press Start 2P", monospace;
       padding: 12px;
       border: 2px solid #636e72;
       border-radius: 8px;
