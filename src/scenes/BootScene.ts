@@ -20,11 +20,17 @@ export class BootScene extends Phaser.Scene {
     });
 
     this.load.image('winner-banner', 'assets/ui/winner-banner.png');
+    this.load.image('ui-buttons', 'assets/ui/buttons.png');
 
     this.load.bitmapFont(
       UI_FONT_KEY,
       'assets/fonts/press-start-2p/thick_8x8.png',
       'assets/fonts/press-start-2p/thick_8x8.xml'
+    );
+    this.load.bitmapFont(
+      'press-start-2p-mono',
+      'assets/fonts/press-start-2p/thick_8x8_mono.png',
+      'assets/fonts/press-start-2p/thick_8x8_mono.xml'
     );
   }
 

@@ -13,9 +13,11 @@ import {
   DUCK_SIZE,
   UI_FONT_KEY,
   UI_FONT_SIZE_MD,
+  RACE_DURATION_MS,
 } from '../config/constants';
 import { Duck } from '../entities/Duck';
 import { Button } from '../ui/Button';
+import { RaceTimer } from '../ui/RaceTimer';
 import { RaceController } from '../systems/RaceController';
 import { SeededRandom } from '../systems/SeededRandom';
 import type { RaceState, GameSceneData } from '../config/types';
@@ -35,6 +37,7 @@ export class GameScene extends Phaser.Scene {
   private winnerNameText!: Phaser.GameObjects.BitmapText;
   private winnerDuckFloatTween?: Phaser.Tweens.Tween;
   private confettiEmitter?: Phaser.GameObjects.Particles.ParticleEmitter;
+  private raceTimer?: RaceTimer;
   private seed?: number;
   private customNames?: string[];
   private lastWinnerName: string | null = null;
@@ -82,6 +85,7 @@ export class GameScene extends Phaser.Scene {
 
     // Update race controller
     this.raceController.update(delta);
+    this.updateRaceTimer();
 
     // Scroll water tiles only during the race
     if (this.raceController.getState() === 'racing') {
@@ -249,6 +253,7 @@ export class GameScene extends Phaser.Scene {
   private createUI(): void {
     const centerX = this.scale.width / 2;
     const topY = 12;
+    const timerY = 18;
 
     // Start button
     this.startButton = new Button(this, centerX, topY, 'Start Race', () => {
@@ -327,6 +332,8 @@ export class GameScene extends Phaser.Scene {
     this.winnerNameText.setDepth(200);
     this.winnerNameText.setScrollFactor(0);
     this.winnerNameText.setVisible(false);
+
+    this.raceTimer = new RaceTimer(this, centerX, timerY);
   }
 
   private startRace(): void {
@@ -510,5 +517,24 @@ export class GameScene extends Phaser.Scene {
     this.confettiEmitter.setScrollFactor(0);
     this.confettiEmitter.stop();
     this.confettiEmitter.setVisible(false);
+  }
+
+  private updateRaceTimer(): void {
+    if (!this.raceTimer) return;
+
+    const state = this.raceController.getState();
+    const elapsed = this.raceController.getElapsedTime();
+
+    if (state === 'racing') {
+      this.raceTimer.setVisible(true);
+      this.raceTimer.setTime(RACE_DURATION_MS - elapsed);
+    } else if (state === 'finished') {
+      this.raceTimer.setVisible(true);
+      this.raceTimer.setTime(0);
+    } else {
+      this.raceTimer.setVisible(false);
+    }
+
+    this.lastRaceState = state;
   }
 }
