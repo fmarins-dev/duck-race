@@ -176,6 +176,7 @@ export class GameScene extends Phaser.Scene {
       TRANSITION_CANVAS_WIDTH,
       TILE_SIZE
     );
+    if (!canvasTex) return;
 
     for (let x = 0; x < TRANSITION_CANVAS_WIDTH; x += TILE_SIZE) {
       const variant = variants[Math.floor(Math.random() * variants.length)];
@@ -496,7 +497,7 @@ export class GameScene extends Phaser.Scene {
 
   private createConfetti(): void {
     if (!this.textures.exists('confetti-pixel')) {
-      const graphics = this.make.graphics({ x: 0, y: 0, add: false });
+      const graphics = this.add.graphics({ x: 0, y: 0 });
       graphics.fillStyle(0xffffff, 1);
       graphics.fillRect(0, 0, 2, 2);
       graphics.generateTexture('confetti-pixel', 2, 2);
@@ -504,7 +505,6 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.confettiEmitter = this.add.particles(0, 0, 'confetti-pixel', {
-      on: false,
       lifespan: { min: 1200, max: 2000 },
       speedX: { min: -240, max: 240 },
       speedY: { min: -260, max: -80 },
@@ -535,6 +535,5 @@ export class GameScene extends Phaser.Scene {
       this.raceTimer.setVisible(false);
     }
 
-    this.lastRaceState = state;
   }
 }
