@@ -10,7 +10,7 @@ export const TILE_SIZE = 16;
 export const DUCK_SIZE = 32;
 
 export const COLORS = {
-  GRASS_GREEN: 0x9acd7a,
+  GRASS_GREEN: 0x6ba541,
 };
 
 export const TILE_INDICES = {
@@ -18,6 +18,7 @@ export const TILE_INDICES = {
   GRASS_SOLID: 4,
   WATER_TOP_VARIANTS: [5, 6, 7, 8],
   WATER_SOLID: 9,
+  GRASS_TOP_BOTTOM_VARIANTS: [10, 11, 12, 13],
 };
 
 // Tile layout zones (row indices, each row = 16px)
@@ -25,13 +26,14 @@ export const LAYOUT = {
   GRASS_TOP_START: 0,
   GRASS_TOP_END: 1,
   GRASS_TO_WATER: 2,
-  WATER_TO_GRASS_BOTTOM: 3,
+  WATER_TO_GRASS: 3,
   WATER_START: 4,
   WATER_END: 13,
-  GRASS_BOTTOM_START: 14,
-  GRASS_BOTTOM_END: 16,
+  WATER_TO_GRASS_BOTTOM: 14,
+  GRASS_BOTTOM: 15,
 };
 
+export const TRANSITION_CANVAS_WIDTH = 512; // POT para WebGL
 export const WATER_SCROLL_SPEED = 30; // px/s (para esquerda)
 export const WATER_TRANSITION_SCROLL_RATIO = 0.6; // transicao mais lenta
 

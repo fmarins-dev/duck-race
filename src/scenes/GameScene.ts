@@ -8,7 +8,9 @@ import {
   RACE_START_X,
   WATER_SCROLL_SPEED,
   WATER_TRANSITION_SCROLL_RATIO,
+  TRANSITION_CANVAS_WIDTH,
   getDuckDisplayConfig,
+  DUCK_SIZE,
   UI_FONT_KEY,
   UI_FONT_SIZE_MD,
 } from '../config/constants';
@@ -27,6 +29,11 @@ export class GameScene extends Phaser.Scene {
   private removeWinnerButton!: Button;
   private menuButton!: Button;
   private winnerText!: Phaser.GameObjects.BitmapText;
+  private winnerOverlay!: Phaser.GameObjects.Rectangle;
+  private winnerBanner!: Phaser.GameObjects.Image;
+  private winnerDuckSprite!: Phaser.GameObjects.Sprite;
+  private winnerNameText!: Phaser.GameObjects.BitmapText;
+  private winnerDuckFloatTween?: Phaser.Tweens.Tween;
   private seed?: number;
   private customNames?: string[];
   private lastWinnerName: string | null = null;
@@ -78,8 +85,10 @@ export class GameScene extends Phaser.Scene {
     // Scroll water tiles only during the race
     if (this.raceController.getState() === 'racing') {
       const baseScroll = WATER_SCROLL_SPEED * (delta / 1000);
+      const lastIndex = this.waterTiles.length - 1;
       for (let i = 0; i < this.waterTiles.length; i++) {
-        const speed = i < 2 ? baseScroll * WATER_TRANSITION_SCROLL_RATIO : baseScroll;
+        const isTransition = i < 2 || i === lastIndex;
+        const speed = isTransition ? baseScroll * WATER_TRANSITION_SCROLL_RATIO : baseScroll;
         this.waterTiles[i].tilePositionX += speed;
       }
     }
@@ -100,26 +109,36 @@ export class GameScene extends Phaser.Scene {
     }
 
     // Row 2: Grass-to-water transition (TileSprite, slower scroll)
-    const grassBottomVariant = TILE_INDICES.GRASS_BOTTOM_VARIANTS[
-      Math.floor(Math.random() * TILE_INDICES.GRASS_BOTTOM_VARIANTS.length)
-    ];
-    this.createWaterTileSprite(LAYOUT.GRASS_TO_WATER, width, grassBottomVariant);
+    this.createVariedTransitionRow(
+      LAYOUT.GRASS_TO_WATER,
+      width,
+      TILE_INDICES.GRASS_BOTTOM_VARIANTS,
+      'transition-grass-to-water'
+    );
 
     // Row 3: Water-to-grass transition (TileSprite, slower scroll)
-    const waterTopVariant = TILE_INDICES.WATER_TOP_VARIANTS[
-      Math.floor(Math.random() * TILE_INDICES.WATER_TOP_VARIANTS.length)
-    ];
-    this.createWaterTileSprite(LAYOUT.WATER_TO_GRASS_BOTTOM, width, waterTopVariant);
+    this.createVariedTransitionRow(
+      LAYOUT.WATER_TO_GRASS,
+      width,
+      TILE_INDICES.WATER_TOP_VARIANTS,
+      'transition-water-to-grass'
+    );
 
     // Rows 4-13: Water solid (TileSprite, full scroll)
     for (let row = LAYOUT.WATER_START; row <= LAYOUT.WATER_END; row++) {
       this.createWaterTileSprite(row, width, TILE_INDICES.WATER_SOLID);
     }
 
-    // Rows 14-16: Grass solid (static)
-    for (let row = LAYOUT.GRASS_BOTTOM_START; row <= LAYOUT.GRASS_BOTTOM_END; row++) {
-      this.createUniformTileRow(row, cols, TILE_INDICES.GRASS_SOLID);
-    }
+    // Row 14: Water-to-grass bottom transition (TileSprite, slower scroll)
+    this.createVariedTransitionRow(
+      LAYOUT.WATER_TO_GRASS_BOTTOM,
+      width,
+      TILE_INDICES.GRASS_TOP_BOTTOM_VARIANTS,
+      'transition-water-to-grass-bottom'
+    );
+
+    // Row 15: Grass solid (static)
+    this.createUniformTileRow(LAYOUT.GRASS_BOTTOM, cols, TILE_INDICES.GRASS_SOLID);
   }
 
   private createUniformTileRow(row: number, cols: number, tileIndex: number): void {
@@ -132,6 +151,35 @@ export class GameScene extends Phaser.Scene {
   private createWaterTileSprite(row: number, width: number, frameIndex: number): void {
     const y = row * TILE_SIZE;
     const tile = this.add.tileSprite(0, y, width, TILE_SIZE, 'tiles', frameIndex);
+    tile.setOrigin(0, 0);
+    tile.setDepth(0);
+    this.waterTiles.push(tile);
+  }
+
+  private createVariedTransitionRow(
+    row: number,
+    width: number,
+    variants: number[],
+    textureKey: string
+  ): void {
+    if (this.textures.exists(textureKey)) {
+      this.textures.remove(textureKey);
+    }
+
+    const canvasTex = this.textures.createCanvas(
+      textureKey,
+      TRANSITION_CANVAS_WIDTH,
+      TILE_SIZE
+    );
+
+    for (let x = 0; x < TRANSITION_CANVAS_WIDTH; x += TILE_SIZE) {
+      const variant = variants[Math.floor(Math.random() * variants.length)];
+      canvasTex.drawFrame('tiles', variant, x, 0, false);
+    }
+    canvasTex.refresh();
+
+    const y = row * TILE_SIZE;
+    const tile = this.add.tileSprite(0, y, width, TILE_SIZE, textureKey);
     tile.setOrigin(0, 0);
     tile.setDepth(0);
     this.waterTiles.push(tile);
@@ -240,6 +288,42 @@ export class GameScene extends Phaser.Scene {
     this.winnerText.setDepth(200);
     this.winnerText.setScrollFactor(0);
     this.winnerText.setVisible(false);
+
+    // Winner overlay (hidden initially)
+    this.winnerOverlay = this.add.rectangle(
+      0,
+      0,
+      this.scale.width,
+      this.scale.height,
+      0x000000,
+      0.5
+    );
+    this.winnerOverlay.setOrigin(0, 0);
+    this.winnerOverlay.setDepth(180);
+    this.winnerOverlay.setScrollFactor(0);
+    this.winnerOverlay.setVisible(false);
+
+    // Winner banner (hidden initially)
+    this.winnerBanner = this.add.image(centerX, centerY, 'winner-banner');
+    this.winnerBanner.setOrigin(0.5, 0.5);
+    this.winnerBanner.setDepth(200);
+    this.winnerBanner.setScrollFactor(0);
+    this.winnerBanner.setVisible(false);
+
+    // Winner duck (hidden initially)
+    this.winnerDuckSprite = this.add.sprite(centerX, centerY, 'ducks', 0);
+    this.winnerDuckSprite.setOrigin(0.5, 0.5);
+    this.winnerDuckSprite.setDepth(200);
+    this.winnerDuckSprite.setScrollFactor(0);
+    this.winnerDuckSprite.setVisible(false);
+
+    // Winner name (hidden initially)
+    this.winnerNameText = this.add.bitmapText(centerX, centerY, UI_FONT_KEY, '', UI_FONT_SIZE_MD);
+    this.winnerNameText.setOrigin(0.5, 0.5);
+    this.winnerNameText.setTint(0xffeb3b);
+    this.winnerNameText.setDepth(200);
+    this.winnerNameText.setScrollFactor(0);
+    this.winnerNameText.setVisible(false);
   }
 
   private startRace(): void {
@@ -248,25 +332,58 @@ export class GameScene extends Phaser.Scene {
     this.removeWinnerButton.setVisible(false);
     this.menuButton.setVisible(false);
     this.winnerText.setVisible(false);
-
+    this.winnerOverlay.setVisible(false);
+    this.winnerBanner.setVisible(false);
+    this.winnerDuckSprite.setVisible(false);
+    this.winnerNameText.setVisible(false);
+    if (this.winnerDuckFloatTween) {
+      this.winnerDuckFloatTween.stop();
+      this.winnerDuckFloatTween.destroy();
+      this.winnerDuckFloatTween = undefined;
+    }
     this.raceController.startRace();
   }
 
   private onRaceComplete(winner: Duck): void {
     this.lastWinnerName = winner.name;
 
-    // Show winner announcement centered on screen
     const centerX = this.scale.width / 2;
     const centerY = this.scale.height / 2;
-    this.winnerText.setText(`${winner.name} wins!`);
-    this.centerBitmapText(this.winnerText, centerX, centerY);
-    this.winnerText.setVisible(true);
 
-    // Gentle pulse animation
-    this.tweens.add({
-      targets: this.winnerText,
-      alpha: { from: 1, to: 0.6 },
-      duration: 800,
+    this.winnerOverlay.setVisible(true);
+    this.winnerBanner.setVisible(true);
+    this.winnerDuckSprite.setVisible(true);
+    this.winnerNameText.setVisible(true);
+    this.winnerText.setVisible(false);
+
+    const targetDuckHeight = this.scale.height / 3;
+    const duckScale = targetDuckHeight / DUCK_SIZE;
+
+    this.winnerDuckSprite.setTexture('ducks', winner.variant.startFrame);
+    this.winnerDuckSprite.play(`swim-${winner.variant.name}`);
+    this.winnerDuckSprite.setScale(duckScale);
+
+    this.winnerNameText.setText(winner.name);
+
+    const bannerH = this.winnerBanner.displayHeight;
+    const duckH = this.winnerDuckSprite.displayHeight;
+    const nameH = this.winnerNameText.height;
+    const gap = 8;
+    const totalH = bannerH + gap + duckH + gap + nameH;
+    const startY = centerY - totalH / 2;
+
+    this.winnerBanner.setPosition(centerX, startY + bannerH / 2);
+    this.winnerDuckSprite.setPosition(centerX, startY + bannerH + gap + duckH / 2);
+    this.winnerNameText.setPosition(centerX, startY + bannerH + gap + duckH + gap + nameH / 2);
+
+    if (this.winnerDuckFloatTween) {
+      this.winnerDuckFloatTween.stop();
+      this.winnerDuckFloatTween.destroy();
+    }
+    this.winnerDuckFloatTween = this.tweens.add({
+      targets: this.winnerDuckSprite,
+      y: this.winnerDuckSprite.y - 4,
+      duration: 900,
       ease: 'Sine.easeInOut',
       yoyo: true,
       repeat: -1,

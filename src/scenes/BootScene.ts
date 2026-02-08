@@ -7,7 +7,7 @@ export class BootScene extends Phaser.Scene {
   }
 
   preload(): void {
-    // Load tileset (16x16 tiles, 4 columns, 1 row)
+    // Load tileset (16x16 tiles, 5 columns, 3 rows)
     this.load.spritesheet('tiles', 'assets/tiles/tiles-sheet.png', {
       frameWidth: 16,
       frameHeight: 16,
@@ -18,6 +18,8 @@ export class BootScene extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 32,
     });
+
+    this.load.image('winner-banner', 'assets/ui/winner-banner.png');
 
     this.load.bitmapFont(
       UI_FONT_KEY,
