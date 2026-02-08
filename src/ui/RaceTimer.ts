@@ -20,7 +20,6 @@ export class RaceTimer extends Phaser.GameObjects.Container {
     [0, -1],
     [0, 1],
   ];
-  private static readonly COLON_GAP = 0;
   private static readonly COLON_TIGHTEN = 2;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
@@ -54,10 +53,6 @@ export class RaceTimer extends Phaser.GameObjects.Container {
     if (!texture.has('counter-frame')) {
       texture.add('counter-frame', 0, 0, 0, 64, 32);
     }
-    if (!texture.has('icon-frame')) {
-      texture.add('icon-frame', 0, 64, 0, 32, 32);
-    }
-
     RaceTimer.framesCreated = true;
   }
 
@@ -113,8 +108,7 @@ export class RaceTimer extends Phaser.GameObjects.Container {
     const minutesW = this.minutesText.width;
     const colonW = this.colonText.width;
     const secondsW = this.secondsText.width;
-    const gap = RaceTimer.COLON_GAP;
-    const totalWidth = minutesW + secondsW + colonW + gap * 2 - RaceTimer.COLON_TIGHTEN;
+    const totalWidth = minutesW + secondsW + colonW - RaceTimer.COLON_TIGHTEN;
     let x = baseX - totalWidth / 2;
 
     this.minutesText.setPosition(x, baseY);
@@ -122,14 +116,14 @@ export class RaceTimer extends Phaser.GameObjects.Container {
       const [dx, dy] = RaceTimer.OUTLINE_OFFSETS[i];
       this.minutesOutline[i].setPosition(x + dx, baseY + dy);
     }
-    x += minutesW + gap;
+    x += minutesW;
 
     this.colonText.setPosition(x, baseY);
     for (let i = 0; i < this.colonOutline.length; i++) {
       const [dx, dy] = RaceTimer.OUTLINE_OFFSETS[i];
       this.colonOutline[i].setPosition(x + dx, baseY + dy);
     }
-    x += colonW + gap - RaceTimer.COLON_TIGHTEN;
+    x += colonW - RaceTimer.COLON_TIGHTEN;
 
     this.secondsText.setPosition(x, baseY);
     for (let i = 0; i < this.secondsOutline.length; i++) {
