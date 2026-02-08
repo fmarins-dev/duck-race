@@ -34,6 +34,7 @@ export class GameScene extends Phaser.Scene {
   private winnerDuckSprite!: Phaser.GameObjects.Sprite;
   private winnerNameText!: Phaser.GameObjects.BitmapText;
   private winnerDuckFloatTween?: Phaser.Tweens.Tween;
+  private confettiEmitter?: Phaser.GameObjects.Particles.ParticleEmitter;
   private seed?: number;
   private customNames?: string[];
   private lastWinnerName: string | null = null;
@@ -303,6 +304,8 @@ export class GameScene extends Phaser.Scene {
     this.winnerOverlay.setScrollFactor(0);
     this.winnerOverlay.setVisible(false);
 
+    this.createConfetti();
+
     // Winner banner (hidden initially)
     this.winnerBanner = this.add.image(centerX, centerY, 'winner-banner');
     this.winnerBanner.setOrigin(0.5, 0.5);
@@ -341,6 +344,8 @@ export class GameScene extends Phaser.Scene {
       this.winnerDuckFloatTween.destroy();
       this.winnerDuckFloatTween = undefined;
     }
+    this.confettiEmitter?.killAll();
+    this.confettiEmitter?.setVisible(false);
     this.raceController.startRace();
   }
 
@@ -375,6 +380,11 @@ export class GameScene extends Phaser.Scene {
     this.winnerBanner.setPosition(centerX, startY + bannerH / 2);
     this.winnerDuckSprite.setPosition(centerX, startY + bannerH + gap + duckH / 2);
     this.winnerNameText.setPosition(centerX, startY + bannerH + gap + duckH + gap + nameH / 2);
+
+    if (this.confettiEmitter) {
+      this.confettiEmitter.setVisible(true);
+      this.confettiEmitter.explode(120, centerX, this.winnerDuckSprite.y);
+    }
 
     if (this.winnerDuckFloatTween) {
       this.winnerDuckFloatTween.stop();
@@ -475,5 +485,30 @@ export class GameScene extends Phaser.Scene {
     const left = Math.round(centerX - text.width / 2);
     text.setOrigin(0, 0.5);
     text.setPosition(left, Math.round(y));
+  }
+
+  private createConfetti(): void {
+    if (!this.textures.exists('confetti-pixel')) {
+      const graphics = this.make.graphics({ x: 0, y: 0, add: false });
+      graphics.fillStyle(0xffffff, 1);
+      graphics.fillRect(0, 0, 2, 2);
+      graphics.generateTexture('confetti-pixel', 2, 2);
+      graphics.destroy();
+    }
+
+    this.confettiEmitter = this.add.particles(0, 0, 'confetti-pixel', {
+      on: false,
+      lifespan: { min: 1200, max: 2000 },
+      speedX: { min: -240, max: 240 },
+      speedY: { min: -260, max: -80 },
+      gravityY: 380,
+      rotate: { min: 0, max: 360 },
+      scale: { start: 1.0, end: 0.2 },
+      tint: [0xff6f61, 0xffc857, 0x7bdff2, 0xb8f2e6, 0xf7aef8, 0xa3f7bf],
+    });
+    this.confettiEmitter.setDepth(190);
+    this.confettiEmitter.setScrollFactor(0);
+    this.confettiEmitter.stop();
+    this.confettiEmitter.setVisible(false);
   }
 }
