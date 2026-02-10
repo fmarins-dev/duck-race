@@ -18,7 +18,8 @@
       "Bash(git config:*)",
       "Bash(npx tsc:*)",
       "mcp__exa__get_code_context_exa",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(ls:*)"
     ]
   }
 }

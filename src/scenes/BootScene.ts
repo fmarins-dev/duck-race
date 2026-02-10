@@ -21,6 +21,8 @@ export class BootScene extends Phaser.Scene {
 
     this.load.image('winner-banner', 'assets/ui/winner-banner.png');
     this.load.image('ui-buttons', 'assets/ui/buttons.png');
+    this.load.image('menu-bg', 'assets/ui/menu-bg.png');
+    this.load.image('logo', 'assets/ui/logo.png');
 
     this.load.bitmapFont(
       UI_FONT_KEY,
@@ -36,6 +38,7 @@ export class BootScene extends Phaser.Scene {
 
   create(): void {
     this.textures.get(UI_FONT_KEY).setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures.get('logo').setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.scene.start('MainMenuScene');
   }
 }

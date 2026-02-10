@@ -1,91 +1,170 @@
 import Phaser from 'phaser';
-import { Button } from '../ui/Button';
 import { ManualNamesPopup } from '../ui/ManualNamesPopup';
 import {
   GAME_WIDTH,
-  MENU_TITLE_Y,
-  MENU_BUTTONS_START_Y,
-  MENU_BUTTON_SPACING,
+  DUCK_VARIANTS,
   UI_FONT_KEY,
   UI_FONT_SIZE_SM,
-  UI_FONT_SIZE_LG,
+  MENU_LOGO_Y,
+  MENU_LOGO_SCALE,
+  MENU_START_TEXT_Y,
+  MENU_DUCK_SCALE,
 } from '../config/constants';
+
+interface MenuItem {
+  label: string;
+  action: () => void;
+  arrow: Phaser.GameObjects.BitmapText;
+  text: Phaser.GameObjects.BitmapText;
+}
 
 export class MainMenuScene extends Phaser.Scene {
   private popup: ManualNamesPopup | null = null;
-  private twitchButton!: Button;
-  private discordButton!: Button;
-  private manualButton!: Button;
+  private menuItems: MenuItem[] = [];
+  private selectedIndex = 0;
 
   constructor() {
     super({ key: 'MainMenuScene' });
   }
 
   create(): void {
+    this.menuItems = [];
+    this.selectedIndex = 0;
+    this.popup = null;
+
     this.cameras.main.roundPixels = true;
     const centerX = GAME_WIDTH / 2;
 
-    // Title
-    const title = this.add.bitmapText(centerX, MENU_TITLE_Y, UI_FONT_KEY, 'Duck Race', UI_FONT_SIZE_LG);
-    this.centerBitmapText(title, centerX, MENU_TITLE_Y);
-    title.setTint(0xffffff);
+    // Background
+    this.add.image(0, 0, 'menu-bg').setOrigin(0, 0);
 
-    // Subtitle
-    const subtitle = this.add.bitmapText(
-      centerX,
-      MENU_TITLE_Y + 20,
-      UI_FONT_KEY,
-      'Choose how to add participants',
-      UI_FONT_SIZE_SM
-    );
-    this.centerBitmapText(subtitle, centerX, MENU_TITLE_Y + 20);
-    subtitle.setTint(0xdfe6e9);
+    // Logo
+    this.add.image(centerX, MENU_LOGO_Y, 'logo').setScale(MENU_LOGO_SCALE);
 
-    // Create buttons
-    this.createButtons(centerX);
+    // Decorative duck (plain, floating on water)
+    this.createMenuDuck();
+
+    // Menu options
+    this.createMenuItems(centerX);
+
+    // Keyboard input
+    this.input.keyboard!.on('keydown-ENTER', () => this.confirmSelection());
+    this.input.keyboard!.on('keydown-UP', () => this.changeSelection(-1));
+    this.input.keyboard!.on('keydown-DOWN', () => this.changeSelection(1));
 
     // Setup test seam
     this.setupTestSeam();
   }
 
-  private createButtons(centerX: number): void {
-    const startY = MENU_BUTTONS_START_Y;
+  private createMenuDuck(): void {
+    const plain = DUCK_VARIANTS.find((v) => v.name === 'plain')!;
 
-    // Twitch button (disabled)
-    this.twitchButton = new Button(
-      this,
-      centerX,
-      startY,
-      'Twitch (Coming soon)',
-      () => {}
-    );
-    this.twitchButton.setEnabled(false);
+    if (!this.anims.exists('swim-plain')) {
+      this.anims.create({
+        key: 'swim-plain',
+        frames: this.anims.generateFrameNumbers('ducks', {
+          start: plain.startFrame,
+          end: plain.endFrame,
+        }),
+        frameRate: 8,
+        repeat: -1,
+      });
+    }
 
-    // Discord button (disabled)
-    this.discordButton = new Button(
-      this,
-      centerX,
-      startY + MENU_BUTTON_SPACING,
-      'Discord (Coming soon)',
-      () => {}
-    );
-    this.discordButton.setEnabled(false);
+    const duck = this.add.sprite(80, 210, 'ducks', plain.startFrame);
+    duck.setScale(MENU_DUCK_SCALE);
+    duck.play('swim-plain');
 
-    // Manual names button (enabled)
-    this.manualButton = new Button(
-      this,
-      centerX,
-      startY + MENU_BUTTON_SPACING * 2,
-      'Manual Names',
-      () => this.showManualNamesPopup()
-    );
+    // Bobbing tween (same as winner duck in GameScene)
+    this.tweens.add({
+      targets: duck,
+      y: duck.y - 4,
+      duration: 900,
+      ease: 'Sine.easeInOut',
+      yoyo: true,
+      repeat: -1,
+    });
+  }
+
+  private createMenuItems(centerX: number): void {
+    const gap = 6;
+    const options = [
+      { label: 'Start new race', action: () => this.showManualNamesPopup() },
+    ];
+
+    options.forEach((opt, i) => {
+      const y = MENU_START_TEXT_Y + i * 20;
+
+      // Measure to center arrow + label together
+      const tempLabel = this.add.bitmapText(0, 0, UI_FONT_KEY, opt.label, UI_FONT_SIZE_SM);
+      const tempArrow = this.add.bitmapText(0, 0, UI_FONT_KEY, '>', UI_FONT_SIZE_SM);
+      const totalWidth = tempArrow.width + gap + tempLabel.width;
+      const arrowWidth = tempArrow.width;
+      tempLabel.destroy();
+      tempArrow.destroy();
+
+      const startX = Math.round(centerX - totalWidth / 2);
+
+      const arrow = this.add.bitmapText(startX, y, UI_FONT_KEY, '>', UI_FONT_SIZE_SM);
+      arrow.setOrigin(0, 0.5);
+      arrow.setTint(0x284154);
+
+      const text = this.add.bitmapText(
+        startX + arrowWidth + gap, y, UI_FONT_KEY, opt.label, UI_FONT_SIZE_SM
+      );
+      text.setOrigin(0, 0.5);
+      text.setTint(0x284154);
+
+      // Click support
+      text.setInteractive({ useHandCursor: true });
+      arrow.setInteractive({ useHandCursor: true });
+      text.on('pointerdown', () => { this.selectedIndex = i; this.confirmSelection(); });
+      arrow.on('pointerdown', () => { this.selectedIndex = i; this.confirmSelection(); });
+
+      this.menuItems.push({ label: opt.label, action: opt.action, arrow, text });
+    });
+
+    this.updateSelection();
+  }
+
+  private changeSelection(dir: number): void {
+    if (this.popup) return;
+    this.selectedIndex = (this.selectedIndex + dir + this.menuItems.length) % this.menuItems.length;
+    this.updateSelection();
+  }
+
+  private updateSelection(): void {
+    this.menuItems.forEach((item, i) => {
+      const selected = i === this.selectedIndex;
+      item.arrow.setVisible(selected);
+
+      // Blink tween on selected item
+      this.tweens.killTweensOf([item.arrow, item.text]);
+      if (selected) {
+        item.arrow.setAlpha(1);
+        item.text.setAlpha(1);
+        this.tweens.add({
+          targets: [item.arrow, item.text],
+          alpha: 0,
+          duration: 600,
+          ease: 'Sine.easeInOut',
+          yoyo: true,
+          repeat: -1,
+        });
+      } else {
+        item.arrow.setAlpha(1);
+        item.text.setAlpha(1);
+      }
+    });
+  }
+
+  private confirmSelection(): void {
+    if (this.popup) return;
+    this.menuItems[this.selectedIndex].action();
   }
 
   private showManualNamesPopup(): void {
     if (this.popup) return;
-
-    // Disable menu buttons while popup is open
-    this.manualButton.setEnabled(false);
 
     this.popup = new ManualNamesPopup(
       this,
@@ -104,9 +183,6 @@ export class MainMenuScene extends Phaser.Scene {
       this.popup.destroy();
       this.popup = null;
     }
-
-    // Re-enable menu button
-    this.manualButton.setEnabled(true);
 
     // Update test seam
     if (window.__TEST_MENU__) {
@@ -140,11 +216,5 @@ export class MainMenuScene extends Phaser.Scene {
         window.__TEST_MENU__.ready = true;
       }
     });
-  }
-
-  private centerBitmapText(text: Phaser.GameObjects.BitmapText, centerX: number, y: number): void {
-    const left = Math.round(centerX - text.width / 2);
-    text.setOrigin(0, 0.5);
-    text.setPosition(left, Math.round(y));
   }
 }

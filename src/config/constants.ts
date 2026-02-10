@@ -78,9 +78,10 @@ export const BUTTON_WIDTH = 170;
 export const BUTTON_HEIGHT = 24;
 
 // Menu
-export const MENU_BUTTON_SPACING = 30;
-export const MENU_TITLE_Y = 50;
-export const MENU_BUTTONS_START_Y = 110;
+export const MENU_LOGO_Y = 72;
+export const MENU_LOGO_SCALE = 4;
+export const MENU_START_TEXT_Y = 150;
+export const MENU_DUCK_SCALE = 3;
 
 // Popup
 export const POPUP_WIDTH = 460;
